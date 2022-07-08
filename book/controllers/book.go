@@ -3,7 +3,8 @@ package controllers
 import (
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/gin-gonic/gin"
-	models2 "go_practice/book/models"
+	"go_practice/book/auth"
+	models "go_practice/book/models"
 	"go_practice/book/structs"
 	"net/http"
 	"strconv"
@@ -22,12 +23,15 @@ import (
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books [get]
+// @Security BearerAuth
 func (c *Controller) FindBooks(ctx *gin.Context) {
-	var books []models2.Book
+	var books []models.Book
+	tokenString := ctx.GetHeader("Authorization")
+	_, claim := auth.ValidateToken(tokenString)
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	paginator := pagination.Paging(&pagination.Param{
-		DB:      models2.DB.Find(&books),
+		DB:      models.DB.Where("user_id = ?", claim.UserId).Find(&books),
 		Page:    page,
 		Limit:   limit,
 		OrderBy: []string{"id desc"},
@@ -49,15 +53,18 @@ func (c *Controller) FindBooks(ctx *gin.Context) {
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books [post]
+// @Security BearerAuth
 func (c *Controller) CreateBook(ctx *gin.Context) {
 	var input structs.CreateBookInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var book models2.Book
-	book = models2.Book{Title: input.Title, Author: input.Author}
-	models2.DB.Create(&book)
+	var book models.Book
+	tokenString := ctx.GetHeader("Authorization")
+	_, claim := auth.ValidateToken(tokenString)
+	book = models.Book{Title: input.Title, Author: input.Author, UserID: claim.UserId}
+	models.DB.Create(&book)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": book})
 }
@@ -74,9 +81,12 @@ func (c *Controller) CreateBook(ctx *gin.Context) {
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books/{id} [get]
+// @Security BearerAuth
 func (c *Controller) FindBook(ctx *gin.Context) {
-	var book models2.Book
-	if err := models2.DB.Where("id = ?", ctx.Param("id")).First(&book).Error; err != nil {
+	var book models.Book
+	tokenString := ctx.GetHeader("Authorization")
+	_, claim := auth.ValidateToken(tokenString)
+	if err := models.DB.Where("id = ? AND user_id = ?", ctx.Param("id"), claim.UserId).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
@@ -96,9 +106,12 @@ func (c *Controller) FindBook(ctx *gin.Context) {
 // @Failure      404      {object}  structs.ErrorResponse
 // @Failure      500      {object}  structs.ErrorResponse
 // @Router       /books/{id} [patch]
+// @Security BearerAuth
 func (c *Controller) UpdateBook(ctx *gin.Context) {
-	var book models2.Book
-	if err := models2.DB.Where("id=?", ctx.Param("id")).First(&book).Error; err != nil {
+	var book models.Book
+	tokenString := ctx.GetHeader("Authorization")
+	_, claim := auth.ValidateToken(tokenString)
+	if err := models.DB.Where("id = ? AND user_id = ?", ctx.Param("id"), claim.UserId).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
@@ -108,7 +121,7 @@ func (c *Controller) UpdateBook(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	models2.DB.Model(&book).Updates(input)
+	models.DB.Model(&book).Updates(input)
 	ctx.JSON(http.StatusOK, gin.H{"data": book})
 }
 
@@ -124,13 +137,16 @@ func (c *Controller) UpdateBook(ctx *gin.Context) {
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books/{id} [delete]
+// @Security BearerAuth
 func (c *Controller) DeleteBook(ctx *gin.Context) {
-	var book models2.Book
-	if err := models2.DB.Where("id=?", ctx.Param("id")).First(&book).Error; err != nil {
+	var book models.Book
+	tokenString := ctx.GetHeader("Authorization")
+	_, claim := auth.ValidateToken(tokenString)
+	if err := models.DB.Where("id = ? AND user_id = ?", ctx.Param("id"), claim.UserId).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
-	models2.DB.Delete(&book)
+	models.DB.Delete(&book)
 
 	ctx.JSON(http.StatusOK, gin.H{"data": true})
 }

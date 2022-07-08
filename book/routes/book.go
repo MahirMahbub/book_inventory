@@ -8,7 +8,7 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-
+	r.Use(middlewares.CORSMiddleware())
 	c := controllers.NewController()
 
 	v1 := r.Group("/api/v1")

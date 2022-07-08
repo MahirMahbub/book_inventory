@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"strings"
 	"time"
 )
 
@@ -15,7 +16,8 @@ type JWTClaim struct {
 	jwt.StandardClaims
 }
 
-func ValidateToken(signedToken string) (err error) {
+func ValidateToken(signedToken string) (err error, claim JWTClaim) {
+	signedToken = strings.Split(signedToken, " ")[1]
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
@@ -35,5 +37,5 @@ func ValidateToken(signedToken string) (err error) {
 		err = errors.New("token expired")
 		return
 	}
-	return
+	return err, *claims
 }

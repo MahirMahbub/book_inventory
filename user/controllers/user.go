@@ -2,10 +2,23 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	models "go_practice/user/models"
+	"go_practice/user/models"
+	_ "go_practice/user/structs"
 	"net/http"
 )
 
+// RegisterUser godoc
+// @Summary      Register User
+// @Description  create user
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        input  body  structs.UserRequest  true  "Create User"
+// @Success      200  {object}  structs.UserResponse
+// @Failure      400  {object}  structs.ErrorResponse
+// @Failure      404  {object}  structs.ErrorResponse
+// @Failure      500  {object}  structs.ErrorResponse
+// @Router       /user/register [post]
 func (c *Controller) RegisterUser(context *gin.Context) {
 	var user models.User
 	if err := context.ShouldBindJSON(&user); err != nil {

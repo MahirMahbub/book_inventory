@@ -73,9 +73,8 @@ definitions:
 host: localhost:5001
 info:
   contact:
-    email: support@swagger.io
+    email: bsse0807@iit.du.ac.bd
     name: API Support
-    url: http://www.swagger.io/support
   description: This is a sample book server.
   license:
     name: Apache 2.0
@@ -119,6 +118,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Show Books
       tags:
       - books
@@ -152,6 +153,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Add a book
       tags:
       - books
@@ -186,6 +189,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a book
       tags:
       - books
@@ -219,6 +224,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Show Books
       tags:
       - books
@@ -256,10 +263,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a book
       tags:
       - books
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
