@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"go_practice/book/controllers"
+	"go_practice/book/middlewares"
 )
 
 func SetupRouter() *gin.Engine {
@@ -12,7 +13,7 @@ func SetupRouter() *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	{
-		bookGroup := v1.Group("/books")
+		bookGroup := v1.Group("/books").Use(middlewares.Auth())
 		{
 			bookGroup.GET(":id", c.FindBook)
 			bookGroup.GET("", c.FindBooks)
