@@ -1,0 +1,264 @@
+definitions:
+  structs.BookDeleteResponse:
+    properties:
+      data:
+        type: boolean
+    type: object
+  structs.BookResponse:
+    properties:
+      data:
+        properties:
+          author:
+            type: string
+          id:
+            type: integer
+          title:
+            type: string
+        type: object
+    type: object
+  structs.BooksPaginatedResponse:
+    properties:
+      data:
+        properties:
+          limit:
+            type: integer
+          next_page:
+            type: integer
+          offset:
+            type: integer
+          page:
+            type: integer
+          prev_page:
+            type: integer
+          records:
+            items:
+              properties:
+                author:
+                  type: string
+                id:
+                  type: integer
+                title:
+                  type: string
+              type: object
+            type: array
+          total_page:
+            type: integer
+          total_record:
+            type: integer
+        type: object
+    type: object
+  structs.CreateBookInput:
+    properties:
+      author:
+        type: string
+      title:
+        type: string
+    required:
+    - author
+    - title
+    type: object
+  structs.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  structs.UpdateBookInput:
+    properties:
+      author:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:5001
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: get books
+      parameters:
+      - description: paginate
+        format: int
+        in: query
+        name: page
+        type: integer
+      - description: paginate
+        format: int
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.BooksPaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Show Books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: post book
+      parameters:
+      - description: Add books
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.CreateBookInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.BookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Add a book
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete book
+      parameters:
+      - description: Book ID
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/structs.BookDeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Delete a book
+      tags:
+      - books
+    get:
+      consumes:
+      - application/json
+      description: get books
+      parameters:
+      - description: Book ID
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.BookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Show Books
+      tags:
+      - books
+    patch:
+      consumes:
+      - application/json
+      description: patch book
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update books
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/structs.UpdateBookInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.BookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Update a book
+      tags:
+      - books
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
