@@ -20,11 +20,6 @@ func SetupRouter() *gin.Engine {
 			bookGroup.DELETE(":id", c.DeleteBook)
 			bookGroup.PATCH(":id", c.UpdateBook)
 		}
-		//r.GET("/books", controllers.FindBooks)
-		//r.POST("/books", controllers.CreateBook)
-		//r.GET("/books/:id", controllers.FindBook)
-		//r.PATCH("/books/:id", controllers.UpdateBook)
-		//r.DELETE("/books/:id", controllers.DeleteBook)
 	}
 	return r
 }
