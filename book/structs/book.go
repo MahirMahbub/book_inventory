@@ -20,6 +20,7 @@ type BooksPaginatedResponse struct {
 			Id     int    `json:"id"`
 			Title  string `json:"title"`
 			Author string `json:"author"`
+			UserId uint   `json:"userId"`
 		} `json:"records"`
 		Offset   int `json:"offset"`
 		Limit    int `json:"limit"`
@@ -34,6 +35,7 @@ type BookResponse struct {
 		Id     int    `json:"id"`
 		Title  string `json:"title"`
 		Author string `json:"author"`
+		UserId uint   `json:"userId"`
 	} `json:"data"`
 }
 

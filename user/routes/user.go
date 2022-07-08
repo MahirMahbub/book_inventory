@@ -8,7 +8,7 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-
+	r.Use(middlewares.CORSMiddleware())
 	c := controllers.NewController()
 
 	v1 := r.Group("/api/v1")
@@ -18,10 +18,10 @@ func SetupRouter() *gin.Engine {
 			userGroup.POST("/token", c.GenerateToken)
 			userGroup.POST("/register", c.RegisterUser)
 		}
-		secured := v1.Group("/secured").Use(middlewares.Auth())
-		{
-			secured.GET("/ping", c.Ping)
-		}
+		//secured := v1.Group("/secured").Use(middlewares.Auth())
+		//{
+		//	secured.GET("/ping", c.Ping)
+		//}
 	}
 	return r
 }

@@ -3,6 +3,7 @@ package main
 import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "go_practice/user/docs"
 	"go_practice/user/models"
 	"go_practice/user/routes"
 )
@@ -18,7 +19,7 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:5001
+// @host      localhost:5002
 // @BasePath  /api/v1
 func main() {
 	models.ConnectDatabase()

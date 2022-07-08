@@ -13,8 +13,7 @@ const docTemplate = `{
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "bsse0807@iit.du.ac.bd"
         },
         "license": {
             "name": "Apache 2.0",
@@ -27,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/books": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get books",
                 "consumes": [
                     "application/json"
@@ -82,6 +86,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "post book",
                 "consumes": [
                     "application/json"
@@ -134,6 +143,11 @@ const docTemplate = `{
         },
         "/books/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get books",
                 "consumes": [
                     "application/json"
@@ -183,6 +197,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "delete book",
                 "consumes": [
                     "application/json"
@@ -232,6 +251,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "patch book",
                 "consumes": [
                     "application/json"
@@ -401,8 +425,10 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

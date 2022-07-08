@@ -1,0 +1,121 @@
+basePath: /api/v1
+definitions:
+  structs.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  structs.TokenRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  structs.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  structs.UserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  structs.UserResponse:
+    properties:
+      email:
+        type: string
+      userId:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:5002
+info:
+  contact:
+    email: bsse0807@iit.du.ac.bd
+    name: API Support
+  description: This is a sample book server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: create user
+      parameters:
+      - description: Create User
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Register User
+      tags:
+      - user
+  /user/token:
+    post:
+      consumes:
+      - application/json
+      description: post token
+      parameters:
+      - description: Create Token
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.TokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Generate Token
+      tags:
+      - token
+swagger: "2.0"
