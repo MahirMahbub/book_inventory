@@ -10,7 +10,7 @@ import (
 
 // @title           Swagger Example API
 // @version         1.0
-// @description     This is a sample server celler server.
+// @description     This is a sample book server.
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   API Support
@@ -21,6 +21,7 @@ import (
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:5001
+// @BasePath  /api/v1
 // @securityDefinitions.basic  BasicAuth
 func main() {
 	//r := gin.Default()

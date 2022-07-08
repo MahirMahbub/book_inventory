@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   structs.BookDeleteResponse:
     properties:
@@ -75,7 +76,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server celler server.
+  description: This is a sample book server.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html

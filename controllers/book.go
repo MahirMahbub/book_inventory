@@ -22,7 +22,7 @@ import (
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books [get]
-func FindBooks(ctx *gin.Context) {
+func (c *Controller) FindBooks(ctx *gin.Context) {
 	var books []models.Book
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
@@ -49,7 +49,7 @@ func FindBooks(ctx *gin.Context) {
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books [post]
-func CreateBook(ctx *gin.Context) {
+func (c *Controller) CreateBook(ctx *gin.Context) {
 	var input structs.CreateBookInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -74,7 +74,7 @@ func CreateBook(ctx *gin.Context) {
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books/{id} [get]
-func FindBook(ctx *gin.Context) {
+func (c *Controller) FindBook(ctx *gin.Context) {
 	var book models.Book
 	if err := models.DB.Where("id = ?", ctx.Param("id")).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
@@ -96,7 +96,7 @@ func FindBook(ctx *gin.Context) {
 // @Failure      404      {object}  structs.ErrorResponse
 // @Failure      500      {object}  structs.ErrorResponse
 // @Router       /books/{id} [patch]
-func UpdateBook(ctx *gin.Context) {
+func (c *Controller) UpdateBook(ctx *gin.Context) {
 	var book models.Book
 	if err := models.DB.Where("id=?", ctx.Param("id")).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
@@ -124,7 +124,7 @@ func UpdateBook(ctx *gin.Context) {
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books/{id} [delete]
-func DeleteBook(ctx *gin.Context) {
+func (c *Controller) DeleteBook(ctx *gin.Context) {
 	var book models.Book
 	if err := models.DB.Where("id=?", ctx.Param("id")).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})

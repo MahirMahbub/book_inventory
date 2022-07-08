@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server celler server.",
+        "description": "This is a sample book server.",
         "title": "Swagger Example API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
@@ -16,6 +16,7 @@
         "version": "1.0"
     },
     "host": "localhost:5001",
+    "basePath": "/api/v1",
     "paths": {
         "/books": {
             "get": {
