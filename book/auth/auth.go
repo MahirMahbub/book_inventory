@@ -3,11 +3,10 @@ package auth
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"os"
 	"strings"
 	"time"
 )
-
-var jwtKey = []byte("supersecretkey")
 
 type JWTClaim struct {
 	Username string `json:"username"`
@@ -17,6 +16,7 @@ type JWTClaim struct {
 }
 
 func ValidateToken(signedToken string) (err error, claim JWTClaim) {
+	var jwtKey = []byte(os.Getenv("TOKEN_SECRET"))
 	signedToken = strings.Split(signedToken, " ")[1]
 	token, err := jwt.ParseWithClaims(
 		signedToken,
