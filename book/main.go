@@ -6,6 +6,7 @@ import (
 	_ "go_practice/book/docs"
 	"go_practice/book/models"
 	"go_practice/book/routes"
+	"os"
 )
 
 // @title           Swagger Example API
@@ -30,8 +31,8 @@ func main() {
 	models.ConnectDatabase()
 	router := routes.SetupRouter()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	err := router.Run(":5001")
+	port := ":" + os.Getenv("BOOK_SERVICE_PORT")
+	err := router.Run(port)
 	if err != nil {
 		return
 	}
