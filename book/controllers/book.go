@@ -6,6 +6,7 @@ import (
 	"go_practice/book/auth"
 	models "go_practice/book/models"
 	"go_practice/book/structs"
+	"go_practice/book/utils"
 	"net/http"
 	"strconv"
 )
@@ -31,14 +32,17 @@ func (c *Controller) FindBooks(ctx *gin.Context) {
 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	paginator := pagination.Paging(&pagination.Param{
-		DB:      models.DB.Where("user_id = ?", claim.UserId).Find(&books),
+		DB:      models.DB.Where("user_id = ?", claim.UserId).Select([]string{"id", "title"}).Find(&books),
 		Page:    page,
 		Limit:   limit,
 		OrderBy: []string{"id desc"},
 		ShowSQL: true,
 	}, &books)
+	bookResponses := utils.CreateHyperBookResponses(ctx, books)
 
+	paginator.Records = bookResponses
 	ctx.JSON(http.StatusOK, gin.H{"data": paginator})
+
 }
 
 // CreateBook godoc
@@ -60,13 +64,21 @@ func (c *Controller) CreateBook(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var book models.Book
+
 	tokenString := ctx.GetHeader("Authorization")
 	_, claim := auth.ValidateToken(tokenString)
-	book = models.Book{Title: input.Title, Author: input.Author, UserID: claim.UserId}
-	models.DB.Create(&book)
 
-	ctx.JSON(http.StatusOK, gin.H{"data": book})
+	var author models.Author
+	if err := models.DB.Where("id = ?", input.AuthorId).First(&author).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Author!"})
+		return
+	}
+
+	var book models.Book
+	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
+	models.DB.Create(&book).Association("Authors").Append(&author)
+	bookResponse := utils.CreateBookResponse(book)
+	ctx.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
 // FindBook godoc
@@ -86,11 +98,12 @@ func (c *Controller) FindBook(ctx *gin.Context) {
 	var book models.Book
 	tokenString := ctx.GetHeader("Authorization")
 	_, claim := auth.ValidateToken(tokenString)
-	if err := models.DB.Where("id = ? AND user_id = ?", ctx.Param("id"), claim.UserId).First(&book).Error; err != nil {
+	if err := models.DB.Preload("Authors").Where("id = ? AND user_id = ?", ctx.Param("id"), claim.UserId).First(&book).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"data": book})
+	bookResponse := utils.CreateBookResponse(book)
+	ctx.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
 // UpdateBook godoc
@@ -122,7 +135,8 @@ func (c *Controller) UpdateBook(ctx *gin.Context) {
 		return
 	}
 	models.DB.Model(&book).Updates(input)
-	ctx.JSON(http.StatusOK, gin.H{"data": book})
+	bookResponse := utils.CreateBookObjectResponse(book)
+	ctx.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
 // DeleteBook godoc
