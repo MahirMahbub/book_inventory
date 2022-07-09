@@ -314,6 +314,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "structs.AuthorBasicResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "structs.BookDeleteResponse": {
             "type": "object",
             "properties": {
@@ -325,19 +336,23 @@ const docTemplate = `{
         "structs.BookResponse": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "author": {
-                            "type": "string"
-                        },
-                        "id": {
-                            "type": "integer"
-                        },
-                        "title": {
-                            "type": "string"
-                        }
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.AuthorBasicResponse"
                     }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },
@@ -367,13 +382,13 @@ const docTemplate = `{
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "author": {
-                                        "type": "string"
-                                    },
                                     "id": {
                                         "type": "integer"
                                     },
                                     "title": {
+                                        "type": "string"
+                                    },
+                                    "url": {
                                         "type": "string"
                                     }
                                 }
@@ -392,11 +407,14 @@ const docTemplate = `{
         "structs.CreateBookInput": {
             "type": "object",
             "required": [
-                "author",
+                "authorId",
                 "title"
             ],
             "properties": {
-                "author": {
+                "authorId": {
+                    "type": "integer"
+                },
+                "description": {
                     "type": "string"
                 },
                 "title": {
@@ -415,7 +433,7 @@ const docTemplate = `{
         "structs.UpdateBookInput": {
             "type": "object",
             "properties": {
-                "author": {
+                "description": {
                     "type": "string"
                 },
                 "title": {

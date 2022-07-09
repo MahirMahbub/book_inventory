@@ -307,6 +307,17 @@
         }
     },
     "definitions": {
+        "structs.AuthorBasicResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "structs.BookDeleteResponse": {
             "type": "object",
             "properties": {
@@ -318,19 +329,23 @@
         "structs.BookResponse": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "author": {
-                            "type": "string"
-                        },
-                        "id": {
-                            "type": "integer"
-                        },
-                        "title": {
-                            "type": "string"
-                        }
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.AuthorBasicResponse"
                     }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },
@@ -360,13 +375,13 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "author": {
-                                        "type": "string"
-                                    },
                                     "id": {
                                         "type": "integer"
                                     },
                                     "title": {
+                                        "type": "string"
+                                    },
+                                    "url": {
                                         "type": "string"
                                     }
                                 }
@@ -385,11 +400,14 @@
         "structs.CreateBookInput": {
             "type": "object",
             "required": [
-                "author",
+                "authorId",
                 "title"
             ],
             "properties": {
-                "author": {
+                "authorId": {
+                    "type": "integer"
+                },
+                "description": {
                     "type": "string"
                 },
                 "title": {
@@ -408,7 +426,7 @@
         "structs.UpdateBookInput": {
             "type": "object",
             "properties": {
-                "author": {
+                "description": {
                     "type": "string"
                 },
                 "title": {

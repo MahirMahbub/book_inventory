@@ -11,6 +11,8 @@ type User struct {
 	Username string `json:"username" gorm:"unique"`
 	Email    string `json:"email" gorm:"unique"`
 	Password string `json:"password"`
+	IsActive bool
+	IsAdmin  bool
 }
 
 func (user *User) HashPassword(password string) error {
