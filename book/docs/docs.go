@@ -407,12 +407,15 @@ const docTemplate = `{
         "structs.CreateBookInput": {
             "type": "object",
             "required": [
-                "authorId",
+                "authorIds",
                 "title"
             ],
             "properties": {
-                "authorId": {
-                    "type": "integer"
+                "authorIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "description": {
                     "type": "string"

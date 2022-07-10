@@ -67,16 +67,20 @@ func (c *Controller) CreateBook(ctx *gin.Context) {
 
 	tokenString := ctx.GetHeader("Authorization")
 	_, claim := auth.ValidateToken(tokenString)
-
-	var author models.Author
-	if err := models.DB.Where("id = ?", input.AuthorId).First(&author).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Author!"})
-		return
+	var authors []models.Author
+	for _, authorId := range input.AuthorIDs {
+		var author models.Author
+		if err := models.DB.Where("id = ?", authorId).First(&author).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Author!"})
+			return
+		}
+		authors = append(authors, author)
 	}
 
 	var book models.Book
 	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
-	models.DB.Create(&book).Association("Authors").Append(&author)
+
+	models.DB.Create(&book).Association("Authors").Append(authors)
 	bookResponse := utils.CreateBookResponse(book)
 	ctx.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
