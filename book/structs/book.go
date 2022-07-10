@@ -2,8 +2,11 @@ package structs
 
 type CreateBookInput struct {
 	Title       string `json:"title" binding:"required"`
-	AuthorId    uint   `json:"authorId" binding:"required"`
+	AuthorIDs   []uint `json:"authorIds" binding:"required"`
 	Description string `json:"description"`
+}
+type T struct {
+	As []int `json:"as"`
 }
 
 type UpdateBookInput struct {

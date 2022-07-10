@@ -60,14 +60,16 @@ definitions:
     type: object
   structs.CreateBookInput:
     properties:
-      authorId:
-        type: integer
+      authorIds:
+        items:
+          type: integer
+        type: array
       description:
         type: string
       title:
         type: string
     required:
-    - authorId
+    - authorIds
     - title
     type: object
   structs.ErrorResponse:
