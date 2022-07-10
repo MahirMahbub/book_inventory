@@ -6,6 +6,7 @@ import (
 	_ "go_practice/user/docs"
 	"go_practice/user/models"
 	"go_practice/user/routes"
+	"os"
 )
 
 // @title           Swagger Example API
@@ -26,7 +27,8 @@ func main() {
 	router := routes.SetupRouter()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	err := router.Run(":5002")
+	port := ":" + os.Getenv("USER_SERVICE_PORT")
+	err := router.Run(port)
 	if err != nil {
 		return
 	}
