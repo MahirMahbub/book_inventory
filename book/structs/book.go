@@ -18,9 +18,8 @@ type BooksPaginatedResponse struct {
 		TotalRecord int `json:"total_record"`
 		TotalPage   int `json:"total_page"`
 		Records     []struct {
-			Id    int    `json:"id"`
-			Title string `json:"title"`
-			Url   string `json:"url"`
+			BookBase
+			Url string `json:"url"`
 		} `json:"records"`
 		Offset   int `json:"offset"`
 		Limit    int `json:"limit"`
@@ -30,34 +29,28 @@ type BooksPaginatedResponse struct {
 	} `json:"data"`
 }
 
-//type BookResponse struct {
-//	Data struct {
-//		Id     int    `json:"id"`
-//		Title  string `json:"title"`
-//		Author string `json:"author"`
-//		UserId uint   `json:"userId"`
-//	} `json:"data"`
-//}
-
-type BookResponse struct {
-	ID          uint                  `json:"id"`
-	Title       string                `json:"title"`
-	UserID      uint                  `json:"userId"`
-	Description string                `json:"description"`
-	Authors     []AuthorBasicResponse `json:"authors"`
+type BookBase struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
 }
-
-type BookUpdateResponse struct {
-	ID          uint   `json:"id"`
-	Title       string `json:"title"`
+type BookBaseResponse struct {
+	BookBase
 	UserID      uint   `json:"userId"`
 	Description string `json:"description"`
 }
 
+type BookResponse struct {
+	BookBaseResponse
+	Authors []AuthorBasicResponse `json:"authors"`
+}
+
+type BookUpdateResponse struct {
+	BookBaseResponse
+}
+
 type HyperBookResponse struct {
-	ID    uint   `json:"id"`
-	Title string `json:"title"`
-	Url   string `json:"url"`
+	BookBase
+	Url string `json:"url"`
 }
 type AuthorResponse struct {
 	ID          uint   `json:"id"`
