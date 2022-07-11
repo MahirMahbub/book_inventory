@@ -5,6 +5,7 @@ import (
 	"go_practice/user/auth"
 	"go_practice/user/models"
 	"go_practice/user/structs"
+	"go_practice/user/utils"
 	"net/http"
 )
 
@@ -24,26 +25,23 @@ func (c *Controller) GenerateToken(context *gin.Context) {
 	var request structs.TokenRequest
 	var user models.User
 	if err := context.ShouldBindJSON(&request); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		context.Abort()
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
 		return
 	}
-	record := models.DB.Where("email = ?", request.Email).First(&user)
-	if record.Error != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": record.Error.Error()})
-		context.Abort()
+
+	//record := models.DB.Where("email = ?", request.Email).First(&user)
+	if err := user.GetUserByEmail(request.Email); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "User not found", err)
 		return
 	}
-	credentialError := user.CheckPassword(request.Password)
-	if credentialError != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-		context.Abort()
+
+	if err := user.CheckPassword(request.Password); err != nil {
+		utils.CustomErrorResponse(context, http.StatusUnauthorized, "invalid credentials", err)
 		return
 	}
 	tokenString, err := auth.GenerateJWT(user.Email, user.Username, user.ID)
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		context.Abort()
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "Token generation failed", err)
 		return
 	}
 	context.JSON(http.StatusOK, gin.H{"token": "Bearer " + tokenString})

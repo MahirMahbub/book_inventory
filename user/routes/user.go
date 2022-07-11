@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go_practice/user/controllers"
+	"go_practice/user/logger"
 	"go_practice/user/middlewares"
 	"io"
 	"log"
@@ -16,14 +17,14 @@ import (
 func SetupRouter() *gin.Engine {
 	gin.DisableConsoleColor()
 	f, _ := os.Create("gin_user.log")
+	log.SetOutput(f)
 	gin.DefaultWriter = io.MultiWriter(f)
+	logger.Logger(f)
 	r := gin.New()
 
 	r.Use(middlewares.CORSMiddleware())
 
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-
-		// your custom format
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
 			param.ClientIP,
 			param.TimeStamp.Format(time.RFC1123),
@@ -58,10 +59,6 @@ func SetupRouter() *gin.Engine {
 			userGroup.POST("/token", c.GenerateToken)
 			userGroup.POST("/register", c.RegisterUser)
 		}
-		//secured := v1.Group("/secured").Use(middlewares.Auth())
-		//{
-		//	secured.GET("/ping", c.Ping)
-		//}
 	}
 	return r
 }
