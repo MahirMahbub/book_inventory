@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go_practice/user/models"
 	_ "go_practice/user/structs"
+	"go_practice/user/utils"
 	"net/http"
 )
 
@@ -22,20 +23,21 @@ import (
 func (c *Controller) RegisterUser(context *gin.Context) {
 	var user models.User
 	if err := context.ShouldBindJSON(&user); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		context.Abort()
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
 		return
 	}
 	if err := user.HashPassword(user.Password); err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		context.Abort()
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
 		return
 	}
-	record := models.DB.Create(&user)
-	if record.Error != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": record.Error.Error()})
-		context.Abort()
+	if err := models.DB.Create(&user).Error; err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "User can not be registered", err)
 		return
 	}
 	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "email": user.Email, "username": user.Username})
+	context.Abort()
 }
+
+//func (c *Controller) ResetLink(context *gin.Context) {
+//	var data forms.ResendCommand
+//}

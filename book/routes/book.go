@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go_practice/book/controllers"
+	"go_practice/book/logger"
 	"go_practice/book/middlewares"
 	"io"
 	"log"
@@ -16,9 +17,10 @@ import (
 func SetupRouter() *gin.Engine {
 	gin.DisableConsoleColor()
 	f, _ := os.Create("gin_book.log")
-	gin.DefaultWriter = io.MultiWriter(f)
 	r := gin.New()
-
+	gin.DefaultWriter = io.MultiWriter(f)
+	logger.Logger(f)
+	//log.SetOutput(f)
 	r.Use(middlewares.CORSMiddleware())
 
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
