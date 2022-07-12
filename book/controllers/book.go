@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"go_practice/book/auth"
+	"go_practice/book/logger"
 	"go_practice/book/models"
 	"go_practice/book/structs"
 	"go_practice/book/utils"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -29,19 +30,37 @@ import (
 // @Security BearerAuth
 func (c *Controller) FindBooks(context *gin.Context) {
 
-	var books []models.Book
+	var books models.Books
+	var err error
+	var page, limit int
 	tokenString := context.GetHeader("Authorization")
-	_, claim := auth.ValidateToken(tokenString)
-	page, _ := strconv.Atoi(context.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(context.DefaultQuery("limit", "10"))
-	var result *gorm.DB
-	if result = models.DB.Where("user_id = ?", claim.UserId).Select([]string{"id", "title"}).Find(&books); result.Error != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, result.Error)
-		log.Fatalln(result.Error)
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+
+	if page, err = strconv.Atoi(context.DefaultQuery("page", "1")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'page' param value type, Integer expected", err, logger.INFO)
+		return
+	}
+
+	if limit, err = strconv.Atoi(context.DefaultQuery("limit", "10")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'limit' param value type, Integer expected", err, logger.INFO)
+		return
+	}
+	var db *gorm.DB
+
+	if db = books.GetUserBooksBySelection(claim.UserId, []string{"id", "title"}); db.Error != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
 	paginator := pagination.Paging(&pagination.Param{
-		DB:      result,
+		DB:      db,
 		Page:    page,
 		Limit:   limit,
 		OrderBy: []string{"id desc"},
@@ -68,10 +87,26 @@ func (c *Controller) FindBooks(context *gin.Context) {
 // @Security BearerAuth
 func (c *Controller) FindBook(context *gin.Context) {
 	var book models.Book
+	var id uint64
+	var err error
 	tokenString := context.GetHeader("Authorization")
-	_, claim := auth.ValidateToken(tokenString)
-	if err := models.DB.Preload("Authors").Where("id = ? AND user_id = ?", context.Param("id"), claim.UserId).First(&book).Error; err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+
+	if id, err = strconv.ParseUint(context.Param("id"), 10, 32); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'id' param value type, Integer expected", err, logger.INFO)
+		return
+	}
+
+	if err := book.GetUserBookWithAuthor(uint(id), claim.UserId); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
 	bookResponse := utils.CreateBookResponse(book)
@@ -93,18 +128,25 @@ func (c *Controller) FindBook(context *gin.Context) {
 // @Security BearerAuth
 func (c *Controller) CreateBook(context *gin.Context) {
 	var input structs.CreateBookInput
+
 	if err := context.ShouldBindJSON(&input); err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 		return
 	}
 
 	tokenString := context.GetHeader("Authorization")
-	_, claim := auth.ValidateToken(tokenString)
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
 	var authors []models.Author
+
 	for _, authorId := range input.AuthorIDs {
 		var author models.Author
+
 		if err := models.DB.Where("id = ?", authorId).First(&author).Error; err != nil {
-			utils.CustomErrorResponse(context, http.StatusNotFound, "Invalid Author!", err)
+			utils.CustomErrorResponse(context, http.StatusNotFound, "invalid Author!", err, logger.INFO)
 			return
 		}
 		authors = append(authors, author)
@@ -114,7 +156,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
 
 	if err := models.DB.Create(&book).Association("Authors").Append(authors).Error; err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not created", err, logger.ERROR)
 		return
 	}
 	bookResponse := utils.CreateBookResponse(book)
@@ -138,19 +180,30 @@ func (c *Controller) CreateBook(context *gin.Context) {
 func (c *Controller) UpdateBook(context *gin.Context) {
 	var book models.Book
 	tokenString := context.GetHeader("Authorization")
-	_, claim := auth.ValidateToken(tokenString)
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+
 	if err := models.DB.Where("id = ? AND user_id = ?", context.Param("id"), claim.UserId).First(&book).Error; err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
 
 	var input structs.UpdateBookInput
+
 	if err := context.ShouldBindJSON(&input); err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 		return
 	}
+
 	if err := models.DB.Model(&book).Updates(input).Error; err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not updated", err, logger.ERROR)
 		return
 	}
 	bookResponse := utils.CreateBookObjectResponse(book)
@@ -174,13 +227,23 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 func (c *Controller) DeleteBook(context *gin.Context) {
 	var book models.Book
 	tokenString := context.GetHeader("Authorization")
-	_, claim := auth.ValidateToken(tokenString)
-	if err := models.DB.Where("id = ? AND user_id = ?", context.Param("id"), claim.UserId).First(&book).Error; err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
 	}
+
+	if err := models.DB.Where("id = ? AND user_id = ?", context.Param("id"), claim.UserId).First(&book).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		return
+	}
+
 	if err := models.DB.Delete(&book).Error; err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not deleted", err, logger.ERROR)
 		return
 	}
 

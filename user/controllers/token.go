@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"go_practice/user/auth"
+	"go_practice/user/logger"
 	"go_practice/user/models"
 	"go_practice/user/structs"
 	"go_practice/user/utils"
@@ -25,23 +28,26 @@ func (c *Controller) GenerateToken(context *gin.Context) {
 	var request structs.TokenRequest
 	var user models.User
 	if err := context.ShouldBindJSON(&request); err != nil {
-		utils.BaseErrorResponse(context, http.StatusBadRequest, err)
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 		return
 	}
 
-	//record := models.DB.Where("email = ?", request.Email).First(&user)
 	if err := user.GetUserByEmail(request.Email); err != nil {
-		utils.CustomErrorResponse(context, http.StatusBadRequest, "User not found", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.CustomErrorResponse(context, http.StatusBadRequest, "user is not found", err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
 
 	if err := user.CheckPassword(request.Password); err != nil {
-		utils.CustomErrorResponse(context, http.StatusUnauthorized, "invalid credentials", err)
+		utils.CustomErrorResponse(context, http.StatusUnauthorized, "invalid credentials", err, logger.INFO)
 		return
 	}
-	tokenString, err := auth.GenerateJWT(user.Email, user.Username, user.ID)
+	tokenString, err := auth.GenerateJWT(user.Email, user.Username, user.ID, user.IsAdmin, user.IsActive)
 	if err != nil {
-		utils.CustomErrorResponse(context, http.StatusBadRequest, "Token generation failed", err)
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "Token generation failed", err, logger.ERROR)
 		return
 	}
 	context.JSON(http.StatusOK, gin.H{"token": "Bearer " + tokenString})
