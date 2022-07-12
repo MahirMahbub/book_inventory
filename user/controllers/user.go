@@ -18,7 +18,7 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        input  body  structs.UserRequest  true  "Create User"
-// @Success      200  {object}  structs.UserResponse
+// @Success      201  {object}  structs.UserResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
