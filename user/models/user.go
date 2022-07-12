@@ -11,8 +11,8 @@ type User struct {
 	Username string `json:"username" gorm:"unique"`
 	Email    string `json:"email" gorm:"unique"`
 	Password string `json:"password"`
-	IsActive bool
-	IsAdmin  bool
+	IsActive bool   `default:"false"`
+	IsAdmin  bool   `default:"false"`
 }
 
 func (user *User) HashPassword(password string) error {
@@ -24,9 +24,43 @@ func (user *User) HashPassword(password string) error {
 	return nil
 }
 func (user *User) CheckPassword(providedPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
-	if err != nil {
+	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
+}
+
+func (user *User) GetUserByEmail(email string) (err error) {
+	return DB.Where("email = ?", email).First(&user).Error
+}
+
+func (user *User) GetUserByID(ID uint) (err error) {
+	return DB.Where("id = ?", ID).First(&user).Error
+}
+
+func (user *User) CreateUser() (err error) {
+	return DB.Create(&user).Error
+}
+
+func (user *User) UpdateUserPass(email string, password string) (err error) {
+	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
 	}
+	if err := user.HashPassword(password); err != nil {
+		return err
+	}
+	if err := DB.Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (user *User) VerifyAccount(email string) (err error) {
+	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return err
+	}
+	user.IsActive = true
+	if err := DB.Save(&user).Error; err != nil {
+		return err
+	}
+
 	return nil
 }
