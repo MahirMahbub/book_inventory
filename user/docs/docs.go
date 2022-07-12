@@ -164,16 +164,16 @@ const docTemplate = `{
                         "type": "string",
                         "format": "string",
                         "description": "verify_user",
-                        "name": "verify_user",
+                        "name": "verify_token",
                         "in": "query",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/structs.UserResponse"
+                            "$ref": "#/definitions/structs.ActiveUserResponse"
                         }
                     },
                     "400": {
@@ -205,6 +205,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "structs.ActiveUserResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "userId": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "structs.ErrorResponse": {
             "type": "object",
             "properties": {

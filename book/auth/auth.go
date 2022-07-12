@@ -39,6 +39,10 @@ func ValidateToken(signedToken string) (err error, claim JWTClaim) {
 		},
 	)
 	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			logger.Info.Println("signature is invalid")
+			return
+		}
 		err = errors.New("token can not be validated")
 		logger.Info.Println(err.Error())
 		return
