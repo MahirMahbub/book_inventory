@@ -57,3 +57,35 @@ func (c *Controller) GenerateToken(context *gin.Context) {
 		"refreshToken": "Bearer " + refreshToken,
 	})
 }
+
+//// RefreshToken godoc
+//// @Summary      Refresh Token
+//// @Description  refreshes the access token
+//// @Tags         user
+//// @Accept       json
+//// @Produce      json
+//// @Param        refresh_token  query  string  true "refresh_token" Format(string)
+//// @Success      200  {object}  structs.TokenResponse
+//// @Failure      400  {object}  structs.ErrorResponse
+//// @Failure      404  {object}  structs.ErrorResponse
+//// @Failure      401  {object}  structs.ErrorResponse
+//// @Failure      403  {object}  structs.ErrorResponse
+//// @Failure      500  {object}  structs.ErrorResponse
+//// @Router       /user/refresh-token [post]
+//func (c *Controller) RefreshToken(context *gin.Context) {
+//	verifyToken, err := context.GetQuery("refresh_token")
+//	if !err {
+//		utils.CustomErrorResponse(context, http.StatusBadRequest, "refresh token is not found", errors.New("refresh token is not found"), logger.INFO)
+//		return
+//	}
+//	_, claim := auth.ValidateToken(verifyToken, []byte(os.Getenv("REFRESH_TOKEN_SECRET")))
+//	tokenString, refreshToken, err_ := auth.GenerateJWT(claim.Email, claim.Username, claim.UserId, claim.IsAdmin, claim.IsActive)
+//	if err_ != nil {
+//		utils.CustomErrorResponse(context, http.StatusBadRequest, "Token generation failed", err_, logger.ERROR)
+//		return
+//	}
+//	context.JSON(http.StatusOK, gin.H{
+//		"token":        "Bearer " + tokenString,
+//		"refreshToken": "Bearer " + refreshToken,
+//	})
+//}

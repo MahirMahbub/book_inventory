@@ -21,6 +21,13 @@ type UserResponse struct {
 	Username string `json:"username"`
 }
 
+type ActiveUserResponse struct {
+	UserId   uint   `json:"userId"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	IsActive bool   `json:"isActive"`
+}
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }

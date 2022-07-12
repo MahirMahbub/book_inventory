@@ -72,7 +72,7 @@ func (c *Controller) RegisterUser(context *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        verify_token  query  string  true "verify_user" Format(string)
-// @Success      201  {object}  structs.UserResponse
+// @Success      200  {object}  structs.ActiveUserResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
@@ -82,7 +82,7 @@ func (c *Controller) VerifyUser(context *gin.Context) {
 	verifyToken, err := context.GetQuery("verify_token")
 	var user models.User
 	if !err {
-		utils.CustomErrorResponse(context, http.StatusBadRequest, "token is not found", errors.New("token is not found"), logger.ERROR)
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "token is not found", errors.New("token is not found"), logger.INFO)
 		return
 	}
 	_, claim := auth.ValidateNonAuthToken(verifyToken, []byte(os.Getenv("ANOTHER_TOKEN_SECRET")))
@@ -100,6 +100,6 @@ func (c *Controller) VerifyUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "email": user.Email, "username": user.Username})
+	context.JSON(http.StatusOK, gin.H{"userId": user.ID, "email": user.Email, "username": user.Username, "isActive": user.IsActive})
 	context.Abort()
 }

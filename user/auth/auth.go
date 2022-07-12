@@ -80,6 +80,54 @@ func GenerateNonAuthJWT(email string) (tokenString string, err error) {
 	return tokenString, err
 }
 
+//
+//func ValidateToken(signedToken string, jwtKey []byte) (err error, claim JWTClaim) {
+//	if len(jwtKey) == 0 {
+//		err = errors.New("token can not be validated")
+//		logger.Error.Println("secret key is not provided")
+//		return
+//	}
+//	if signedToken == "" {
+//		err = errors.New("no token is provided")
+//		logger.Info.Println(err.Error())
+//		return
+//	}
+//	signedToken = strings.Split(signedToken, " ")[1]
+//	token, err := jwt.ParseWithClaims(
+//		signedToken,
+//		&JWTClaim{},
+//		func(token *jwt.Token) (interface{}, error) {
+//			return []byte(jwtKey), nil
+//		},
+//	)
+//	if err != nil {
+//		if err == jwt.ErrSignatureInvalid {
+//			logger.Info.Println("signature is invalid")
+//			return
+//		}
+//		err = errors.New("token can not be validated")
+//		logger.Info.Println(err.Error())
+//		return
+//	}
+//	claims, ok := token.Claims.(*JWTClaim)
+//	if !ok {
+//		err = errors.New("couldn't parse claims")
+//		logger.Info.Println(err.Error())
+//		return
+//	}
+//	if claims.ExpiresAt < time.Now().Local().Unix() {
+//		err = errors.New("token expired")
+//		logger.Info.Println(err.Error())
+//		return
+//	}
+//	if !claims.IsActive {
+//		err = errors.New("user is not active")
+//		logger.Info.Println(err.Error())
+//		return
+//	}
+//	return err, *claims
+//}
+
 func ValidateNonAuthToken(signedToken string, jwtKey []byte) (err error, claim NonAuthJWTClaim) {
 	if signedToken == "" {
 		err = errors.New("no token is provided")
@@ -94,6 +142,10 @@ func ValidateNonAuthToken(signedToken string, jwtKey []byte) (err error, claim N
 		},
 	)
 	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			logger.Info.Println("signature is invalid")
+			return
+		}
 		err = errors.New("token can not be validated")
 		logger.Info.Println(err.Error())
 		return

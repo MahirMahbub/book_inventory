@@ -1,5 +1,16 @@
 basePath: /api/v1
 definitions:
+  structs.ActiveUserResponse:
+    properties:
+      email:
+        type: string
+      isActive:
+        type: boolean
+      userId:
+        type: integer
+      username:
+        type: string
+    type: object
   structs.ErrorResponse:
     properties:
       error:
@@ -141,16 +152,16 @@ paths:
       - description: verify_user
         format: string
         in: query
-        name: verify_user
+        name: verify_token
         required: true
         type: string
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/structs.UserResponse'
+            $ref: '#/definitions/structs.ActiveUserResponse'
         "400":
           description: Bad Request
           schema:
