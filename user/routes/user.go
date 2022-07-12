@@ -58,6 +58,7 @@ func SetupRouter() *gin.Engine {
 		{
 			userGroup.POST("/token", c.GenerateToken)
 			userGroup.POST("/register", c.RegisterUser)
+			userGroup.POST("/verify", c.VerifyUser)
 		}
 	}
 	return r

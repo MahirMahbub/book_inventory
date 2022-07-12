@@ -47,10 +47,13 @@ func (c *Controller) GenerateToken(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusUnauthorized, "invalid credentials", err, logger.INFO)
 		return
 	}
-	tokenString, err := auth.GenerateJWT(user.Email, user.Username, user.ID, user.IsAdmin, user.IsActive)
+	tokenString, refreshToken, err := auth.GenerateJWT(user.Email, user.Username, user.ID, user.IsAdmin, user.IsActive)
 	if err != nil {
 		utils.CustomErrorResponse(context, http.StatusBadRequest, "Token generation failed", err, logger.ERROR)
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"token": "Bearer " + tokenString})
+	context.JSON(http.StatusOK, gin.H{
+		"token":        "Bearer " + tokenString,
+		"refreshToken": "Bearer " + refreshToken,
+	})
 }

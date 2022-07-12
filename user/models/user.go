@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -56,6 +57,21 @@ func (user *User) UpdateUserPass(email string, password string) (err error) {
 func (user *User) VerifyAccount(email string) (err error) {
 	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
+	}
+	user.IsActive = true
+	if err := DB.Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (user *User) UpdateUserActive(email string) (err error) {
+	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return err
+	}
+	if err := DB.Where("email = ? AND is_active = ?", email, true).First(&user).Error; !errors.Is(err, gorm.ErrRecordNotFound) {
+		return errors.New("user account is already activated")
 	}
 	user.IsActive = true
 	if err := DB.Save(&user).Error; err != nil {

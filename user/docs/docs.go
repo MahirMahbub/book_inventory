@@ -145,6 +145,63 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/verify": {
+            "post": {
+                "description": "Activate User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Verify User",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "string",
+                        "description": "verify_user",
+                        "name": "verify_user",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/structs.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -170,6 +227,9 @@ const docTemplate = `{
         "structs.TokenResponse": {
             "type": "object",
             "properties": {
+                "refreshToken": {
+                    "type": "string"
+                },
                 "token": {
                     "type": "string"
                 }
