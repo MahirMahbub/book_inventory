@@ -19,7 +19,7 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        input  body  structs.TokenRequest  true  "Create Token"
-// @Success      201  {object}  structs.TokenResponse
+// @Success      200  {object}  structs.TokenResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      401  {object}  structs.ErrorResponse
