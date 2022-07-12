@@ -5,7 +5,8 @@ type TokenRequest struct {
 	Password string `json:"password"`
 }
 type TokenResponse struct {
-	Token string `json:"token"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 type UserRequest struct {
