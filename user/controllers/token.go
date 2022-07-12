@@ -22,6 +22,8 @@ import (
 // @Success      200  {object}  structs.TokenResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /user/token [post]
 func (c *Controller) GenerateToken(context *gin.Context) {

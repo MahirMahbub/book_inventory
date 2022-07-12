@@ -21,6 +21,7 @@ import (
 // @Success      200  {object}  structs.UserResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /user/register [post]
 func (c *Controller) RegisterUser(context *gin.Context) {

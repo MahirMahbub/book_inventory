@@ -24,6 +24,8 @@ import (
 // @Param        limit   query  int  false "paginate" Format(int)
 // @Success      200  {object}  structs.BooksPaginatedResponse
 // @Failure      400  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books [get]
@@ -81,6 +83,8 @@ func (c *Controller) FindBooks(context *gin.Context) {
 // @Param        id  path  int true "Book ID" Format(int)
 // @Success      200  {object}  structs.BookResponse
 // @Failure      400  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books/{id} [get]
@@ -120,8 +124,10 @@ func (c *Controller) FindBook(context *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        input  body  structs.CreateBookInput  true  "Add books"
-// @Success      200  {object}  structs.BookResponse
+// @Success      201  {object}  structs.BookResponse
 // @Failure      400  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books [post]
@@ -160,7 +166,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 		return
 	}
 	bookResponse := utils.CreateBookResponse(book)
-	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
+	context.JSON(http.StatusCreated, gin.H{"data": bookResponse})
 }
 
 // UpdateBook godoc
@@ -173,6 +179,8 @@ func (c *Controller) CreateBook(context *gin.Context) {
 // @Param        input  body  structs.UpdateBookInput  false  "Update books"
 // @Success      200      {object}  structs.BookResponse
 // @Failure      400      {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404      {object}  structs.ErrorResponse
 // @Failure      500      {object}  structs.ErrorResponse
 // @Router       /books/{id} [patch]
@@ -220,6 +228,8 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 // @Param        id   path      int  true  "Book ID"  Format(int)
 // @Success      204  {object}  structs.BookDeleteResponse
 // @Failure      400  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
 // @Router       /books/{id} [delete]
@@ -247,5 +257,5 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"data": true})
+	context.JSON(http.StatusNoContent, gin.H{"data": true})
 }
