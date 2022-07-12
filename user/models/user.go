@@ -24,30 +24,22 @@ func (user *User) HashPassword(password string) error {
 	return nil
 }
 func (user *User) CheckPassword(providedPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
-	if err != nil {
-		return err
-	}
-	return nil
+	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
 }
 
 func (user *User) GetUserByEmail(email string) (err error) {
-	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
-		return err
-	}
-	return nil
+	return DB.Where("email = ?", email).First(&user).Error
 }
 
-func (user *User) GetUserByID(id uint) (err error) {
+func (user *User) GetUserByID(ID uint) (err error) {
+	return DB.Where("id = ?", ID).First(&user).Error
+}
 
-	if err := DB.Where("ID = ?", id).First(&user).Error; err != nil {
-		return err
-	}
-	return nil
+func (user *User) CreateUser() (err error) {
+	return DB.Create(&user).Error
 }
 
 func (user *User) UpdateUserPass(email string, password string) (err error) {
-
 	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
 	}
