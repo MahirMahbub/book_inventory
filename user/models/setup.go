@@ -13,5 +13,6 @@ func ConnectDatabase() {
 		panic("Failed to connect to database!")
 	}
 	database.AutoMigrate(&User{})
+	database.AutoMigrate(&Token{})
 	DB = database
 }

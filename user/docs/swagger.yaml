@@ -1,19 +1,13 @@
 basePath: /api/v1
 definitions:
-  structs.ActiveUserResponse:
-    properties:
-      email:
-        type: string
-      isActive:
-        type: boolean
-      userId:
-        type: integer
-      username:
-        type: string
-    type: object
   structs.ErrorResponse:
     properties:
       error:
+        type: string
+    type: object
+  structs.MessageResponse:
+    properties:
+      message:
         type: string
     type: object
   structs.TokenRequest:
@@ -63,6 +57,48 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /user/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: refreshes the access token
+      parameters:
+      - description: refresh_token
+        format: string
+        in: query
+        name: refresh_token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Refresh Token
+      tags:
+      - user
   /user/register:
     post:
       consumes:
@@ -161,7 +197,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/structs.ActiveUserResponse'
+            $ref: '#/definitions/structs.MessageResponse'
         "400":
           description: Bad Request
           schema:

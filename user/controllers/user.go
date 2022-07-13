@@ -62,7 +62,6 @@ func (c *Controller) RegisterUser(context *gin.Context) {
 	html := "<strong>" + body + "</strong>"
 	fmt.Println(html)
 	context.JSON(http.StatusCreated, gin.H{"userId": user.ID, "email": user.Email, "username": user.Username})
-	context.Abort()
 }
 
 // VerifyUser godoc
@@ -72,7 +71,7 @@ func (c *Controller) RegisterUser(context *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        verify_token  query  string  true "verify_user" Format(string)
-// @Success      200  {object}  structs.ActiveUserResponse
+// @Success      200  {object}  structs.MessageResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
@@ -100,6 +99,5 @@ func (c *Controller) VerifyUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"userId": user.ID, "email": user.Email, "username": user.Username, "isActive": user.IsActive})
-	context.Abort()
+	context.JSON(http.StatusOK, gin.H{"message": "user is verified"})
 }
