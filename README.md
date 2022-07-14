@@ -6,3 +6,13 @@
 ## Services
 - book service
 - user service
+  - JWT Authentication
+    - Register
+    - Log In
+    - User Verification with Resend
+    - Password Change with Resend
+    - Access Token and Refresh Token
+    - Refresh Token Automatic Reuse Detection
+    - User Verification and Password Change Multiple Token-link Detection
+
+    
