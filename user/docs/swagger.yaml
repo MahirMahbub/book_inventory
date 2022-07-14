@@ -1,5 +1,15 @@
 basePath: /api/v1
 definitions:
+  structs.ChangePasswordRequest:
+    properties:
+      confirm:
+        type: string
+      password:
+        type: string
+    required:
+    - confirm
+    - password
+    type: object
   structs.ErrorResponse:
     properties:
       error:
@@ -10,12 +20,22 @@ definitions:
       message:
         type: string
     type: object
+  structs.PasswordChangeTokenRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   structs.TokenRequest:
     properties:
       email:
         type: string
       password:
         type: string
+    required:
+    - email
+    - password
     type: object
   structs.TokenResponse:
     properties:
@@ -34,6 +54,11 @@ definitions:
         type: string
       username:
         type: string
+    required:
+    - email
+    - name
+    - password
+    - username
     type: object
 host: localhost:5002
 info:
@@ -48,6 +73,49 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /user/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change Password
+      parameters:
+      - description: Verify Token
+        in: query
+        name: verify_token
+        required: true
+        type: string
+      - description: Change Password
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Change the user account password
+      tags:
+      - user
   /user/refresh-token:
     post:
       consumes:
@@ -164,6 +232,44 @@ paths:
           schema:
             $ref: '#/definitions/structs.ErrorResponse'
       summary: Resend Verify User Email
+      tags:
+      - user
+  /user/send-password-change-token:
+    post:
+      consumes:
+      - application/json
+      description: Change Password
+      parameters:
+      - description: Create Password Change Token
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.PasswordChangeTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      summary: Send Password Change Email
       tags:
       - user
   /user/token:

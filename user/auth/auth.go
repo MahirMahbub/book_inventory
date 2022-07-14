@@ -103,9 +103,9 @@ func RefreshValidateToken(signedToken string, jwtKey []byte) (err error, claim J
 		return
 	}
 	if !token_.IsActive {
-		var token_active models.Token
+		var tokenActive models.Token
 		err = errors.New("old refresh token")
-		err_ := token_active.UpdateToken(token_.Email, map[string]interface{}{"is_active": false})
+		err_ := tokenActive.UpdateToken(token_.Email, map[string]interface{}{"is_active": false})
 		if err_ != nil {
 			logger.Error.Println("the tokens can not be deactivated, potential risks")
 			err_ = errors.New("refresh token can not be validated")
