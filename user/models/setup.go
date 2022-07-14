@@ -14,5 +14,6 @@ func ConnectDatabase() {
 	}
 	database.AutoMigrate(&User{})
 	database.AutoMigrate(&Token{})
+	database.AutoMigrate(&NonAuthToken{})
 	DB = database
 }

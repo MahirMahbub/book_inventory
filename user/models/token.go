@@ -12,12 +12,12 @@ type Token struct {
 }
 type Tokens []Token
 
-func (token *Token) GetTokenByAccessToken(AccessToken string) (err error) {
-	return DB.Where("access_token = ?", AccessToken).First(&token).Error
+func (token *Token) GetTokenByAccessToken(accessToken string) (err error) {
+	return DB.Where("access_token = ?", accessToken).First(&token).Error
 }
 
-func (token *Token) GetTokenByRefreshToken(RefreshToken string) (err error) {
-	return DB.Where("refresh_token = ?", RefreshToken).First(&token).Error
+func (token *Token) GetTokenByRefreshToken(refreshToken string) (err error) {
+	return DB.Where("refresh_token = ?", refreshToken).First(&token).Error
 }
 
 func (token *Token) CreateToken() (err error) {
