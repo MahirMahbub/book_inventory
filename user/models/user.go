@@ -1,16 +1,17 @@
 package models
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
 	gorm.Model
-	Name     string `json:"name"`
-	Username string `json:"username" gorm:"unique"`
-	Email    string `json:"email" gorm:"unique"`
-	Password string `json:"password"`
+	Name     string `json:"name" gorm:"not null"`
+	Username string `json:"username" gorm:"unique" gorm:"not null"`
+	Email    string `json:"email" gorm:"unique" gorm:"not null"`
+	Password string `json:"password" gorm:"not null"`
 	IsActive bool   `default:"false"`
 	IsAdmin  bool   `default:"false"`
 }
@@ -39,7 +40,7 @@ func (user *User) CreateUser() (err error) {
 	return DB.Create(&user).Error
 }
 
-func (user *User) UpdateUserPass(email string, password string) (err error) {
+func (user *User) UpdateUserPassword(email string, password string) (err error) {
 	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
 	}
@@ -56,6 +57,21 @@ func (user *User) UpdateUserPass(email string, password string) (err error) {
 func (user *User) VerifyAccount(email string) (err error) {
 	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
+	}
+	user.IsActive = true
+	if err := DB.Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (user *User) UpdateUserActive(email string) (err error) {
+	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return err
+	}
+	if err := DB.Where("email = ? AND is_active = ?", email, true).First(&user).Error; !errors.Is(err, gorm.ErrRecordNotFound) {
+		return errors.New("user account is already activated")
 	}
 	user.IsActive = true
 	if err := DB.Save(&user).Error; err != nil {

@@ -58,6 +58,11 @@ func SetupRouter() *gin.Engine {
 		{
 			userGroup.POST("/token", c.GenerateToken)
 			userGroup.POST("/register", c.RegisterUser)
+			userGroup.PUT("/verify", c.VerifyUser)
+			userGroup.POST("/refresh-token", c.RefreshToken)
+			userGroup.POST("/resend-verify-token", c.ResendUserVerifyEmail)
+			userGroup.POST("/send-password-change-token", c.SendPasswordChangeEmail)
+			userGroup.PUT("/change-password", c.ChangePassword)
 		}
 	}
 	return r
