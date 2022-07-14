@@ -4,11 +4,11 @@ import "github.com/jinzhu/gorm"
 
 type Token struct {
 	gorm.Model
-	AccessToken  string
-	RefreshToken string
-	ChildID      uint `gorm:"default:null"`
-	IsActive     bool `gorm:"default:true"`
-	Email        string
+	AccessToken  string `gorm:"not null"`
+	RefreshToken string `gorm:"not null"`
+	ChildID      uint   `gorm:"default:null"`
+	IsActive     bool   `gorm:"default:true"`
+	Email        string `gorm:"not null"`
 }
 type Tokens []Token
 

@@ -8,10 +8,10 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string `json:"name"`
-	Username string `json:"username" gorm:"unique"`
-	Email    string `json:"email" gorm:"unique"`
-	Password string `json:"password"`
+	Name     string `json:"name" gorm:"not null"`
+	Username string `json:"username" gorm:"unique" gorm:"not null"`
+	Email    string `json:"email" gorm:"unique" gorm:"not null"`
+	Password string `json:"password" gorm:"not null"`
 	IsActive bool   `default:"false"`
 	IsAdmin  bool   `default:"false"`
 }
@@ -40,7 +40,7 @@ func (user *User) CreateUser() (err error) {
 	return DB.Create(&user).Error
 }
 
-func (user *User) UpdateUserPass(email string, password string) (err error) {
+func (user *User) UpdateUserPassword(email string, password string) (err error) {
 	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
 	}
