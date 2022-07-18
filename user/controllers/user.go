@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"go_practice/user/auth"
 	"go_practice/user/logger"
 	"go_practice/user/models"
@@ -12,6 +11,7 @@ import (
 	"go_practice/user/structs"
 	_ "go_practice/user/structs"
 	"go_practice/user/utils"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 )
@@ -213,7 +213,7 @@ func (c *Controller) VerifyUser(context *gin.Context) {
 	}
 
 	err_ := token.GetNonAuthTokenByVerifyToken(verifyToken)
-	if gorm.IsRecordNotFoundError(err_) {
+	if errors.Is(err_, gorm.ErrRecordNotFound) {
 		err_ = errors.New("old verify token provided")
 		utils.CustomErrorResponse(context, http.StatusBadRequest,
 			"this link is invalid or old.", err_, logger.INFO)
@@ -278,7 +278,7 @@ func (c *Controller) ChangePassword(context *gin.Context) {
 	}
 
 	err_ := token.GetNonAuthTokenByPasswordChangeToken(verifyToken)
-	if gorm.IsRecordNotFoundError(err_) {
+	if errors.Is(err_, gorm.ErrRecordNotFound) {
 		err_ = errors.New("old verify token provided")
 		utils.CustomErrorResponse(context, http.StatusBadRequest,
 			"this link is invalid or old.", err_, logger.INFO)
