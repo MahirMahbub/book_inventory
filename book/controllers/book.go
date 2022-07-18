@@ -2,14 +2,13 @@ package controllers
 
 import (
 	"errors"
-	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"go_practice/book/auth"
 	"go_practice/book/logger"
 	"go_practice/book/models"
 	"go_practice/book/structs"
 	"go_practice/book/utils"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -61,7 +60,7 @@ func (c *Controller) FindBooks(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
-	paginator := pagination.Paging(&pagination.Param{
+	paginator := utils.Paging(&utils.Param{
 		DB:      db,
 		Page:    page,
 		Limit:   limit,
@@ -75,8 +74,8 @@ func (c *Controller) FindBooks(context *gin.Context) {
 }
 
 // FindBook godoc
-// @Summary      Show Books
-// @Description  get books
+// @Summary      Show Book Details
+// @Description  get book
 // @Tags         books
 // @Accept       json
 // @Produce      json
@@ -161,7 +160,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 	var book models.Book
 	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
 
-	if err := models.DB.Create(&book).Association("Authors").Append(authors).Error; err != nil {
+	if err := models.DB.Create(&book).Association("Authors").Append(authors); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not created", err, logger.ERROR)
 		return
 	}

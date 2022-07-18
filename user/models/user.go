@@ -70,13 +70,12 @@ func (user *User) UpdateUserActive(email string) (err error) {
 	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
 		return err
 	}
-	if err := DB.Where("email = ? AND is_active = ?", email, true).First(&user).Error; !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := DB.Where("email = ? AND is_active = ?", email, true).First(&user).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("user account is already activated")
 	}
 	user.IsActive = true
 	if err := DB.Save(&user).Error; err != nil {
 		return err
 	}
-
 	return nil
 }
