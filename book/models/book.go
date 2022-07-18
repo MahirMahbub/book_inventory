@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Book struct {
@@ -20,12 +20,6 @@ type Author struct {
 	LastName    string  `json:"last_name" gorm:"not null"`
 	Description string  `gorm:"size:6000" json:"description"`
 	Books       []*Book `gorm:"many2many:authors_books;" json:"books"`
-	Contact     []*AuthorContact
-}
-type AuthorContact struct {
-	gorm.Model
-	Platform string `json:"platform"`
-	URL      string `json:"url"`
 }
 
 func (book *Book) GetUserBookByID(ID uint, userID uint) (err error) {

@@ -1,0 +1,21 @@
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/user/token        --> go_practice/user/controllers.(*Controller).GenerateToken-fm (4 handlers)
+[GIN-debug] POST   /api/v1/user/register     --> go_practice/user/controllers.(*Controller).RegisterUser-fm (4 handlers)
+[GIN-debug] PUT    /api/v1/user/verify       --> go_practice/user/controllers.(*Controller).VerifyUser-fm (4 handlers)
+[GIN-debug] POST   /api/v1/user/refresh-token --> go_practice/user/controllers.(*Controller).RefreshToken-fm (4 handlers)
+[GIN-debug] POST   /api/v1/user/resend-verify-token --> go_practice/user/controllers.(*Controller).ResendUserVerifyEmail-fm (4 handlers)
+[GIN-debug] POST   /api/v1/user/send-password-change-token --> go_practice/user/controllers.(*Controller).SendPasswordChangeEmail-fm (4 handlers)
+[GIN-debug] PUT    /api/v1/user/change-password --> go_practice/user/controllers.(*Controller).ChangePassword-fm (4 handlers)
+[GIN-debug] GET    /swagger/*any             --> github.com/swaggo/gin-swagger.CustomWrapHandler.func1 (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :5002
+::1 - [Mon, 18 Jul 2022 00:02:33 +06] "GET /swagger/index.html HTTP/1.1 200 826.7µs "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" "
+::1 - [Mon, 18 Jul 2022 00:02:33 +06] "GET /swagger/swagger-ui.css HTTP/1.1 200 1.0273ms "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" "
+::1 - [Mon, 18 Jul 2022 00:02:33 +06] "GET /swagger/swagger-ui-standalone-preset.js HTTP/1.1 200 1.066ms "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" "
+::1 - [Mon, 18 Jul 2022 00:02:33 +06] "GET /swagger/swagger-ui-bundle.js HTTP/1.1 200 32.031ms "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" "
+::1 - [Mon, 18 Jul 2022 00:02:34 +06] "GET /swagger/doc.json HTTP/1.1 200 1.4397ms "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" "
+::1 - [Mon, 18 Jul 2022 00:05:16 +06] "POST /api/v1/user/token HTTP/1.1 200 14.5194605s "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" "

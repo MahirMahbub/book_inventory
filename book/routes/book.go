@@ -45,7 +45,7 @@ func SetupRouter() *gin.Engine {
 		}
 		c.AbortWithStatus(http.StatusInternalServerError)
 	}))
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}

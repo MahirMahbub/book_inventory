@@ -3,12 +3,12 @@ package controllers
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"go_practice/user/auth"
 	"go_practice/user/logger"
 	"go_practice/user/models"
 	"go_practice/user/structs"
 	"go_practice/user/utils"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 )
