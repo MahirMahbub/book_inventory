@@ -15,10 +15,10 @@ func ConnectDatabase() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbUser := os.Getenv("DB_USER")
 	dbName := os.Getenv("DB_NAME")
-	dbTimeZone := os.Getenv("DB_TIMEZONE")
+	//dbTimeZone := os.Getenv("DB_TIMEZONE")
 	dbSSLMode := os.Getenv("DB_SSL")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-		dbHost, dbUser, dbPassword, dbName, dbPort, dbSSLMode, dbTimeZone)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		dbHost, dbUser, dbPassword, dbName, dbPort, dbSSLMode)
 
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
