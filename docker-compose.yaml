@@ -108,7 +108,7 @@ services:
       - kibana
       - postgres
 #  dejavu:
-#    image: appbaseio/dejavu:3.6.0
+#    image: "appbaseio/dejavu:latest"
 #    container_name: dejavu
 #    ports:
 #      - '1358:1358'
