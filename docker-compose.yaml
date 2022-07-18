@@ -85,7 +85,7 @@ services:
       - LOGSTASH_JDBC_PASSWORD=passwordnyaPostgres
       - LOGSTASH_ELASTICSEARCH_HOST=http://elasticsearch:9200
     volumes:
-      - ./postgres-jdbc-input.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./elk/postgres-jdbc-input.conf:/usr/share/logstash/pipeline/logstash.conf
     ports:
       - "9600:9600"
       - "5044:5044"
