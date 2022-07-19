@@ -172,7 +172,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "get books",
+                "description": "get book",
                 "consumes": [
                     "application/json"
                 ],
@@ -182,7 +182,7 @@ const docTemplate = `{
                 "tags": [
                     "books"
                 ],
-                "summary": "Show Books",
+                "summary": "Show Book Details",
                 "parameters": [
                     {
                         "type": "integer",
@@ -371,6 +371,64 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/elastic/info": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get elastic details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "elastic"
+                ],
+                "summary": "Get Elastic Info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ElasticJsonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -483,6 +541,12 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 }
+            }
+        },
+        "structs.ElasticJsonResponse": {
+            "type": "object",
+            "properties": {
+                "data": {}
             }
         },
         "structs.ErrorResponse": {

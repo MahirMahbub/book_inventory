@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"go_practice/book/controllers"
+	"go_practice/book/elasticsearch"
 	"go_practice/book/logger"
 	"go_practice/book/middlewares"
 	"io"
@@ -22,6 +23,7 @@ func SetupRouter() *gin.Engine {
 	logger.Logger(f)
 	//log.SetOutput(f)
 	r.Use(middlewares.CORSMiddleware())
+	r.Use(elasticsearch.Client())
 
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 
@@ -61,6 +63,10 @@ func SetupRouter() *gin.Engine {
 			bookGroup.POST("", c.CreateBook)
 			bookGroup.DELETE(":id", c.DeleteBook)
 			bookGroup.PATCH(":id", c.UpdateBook)
+		}
+		elasticGroup := v1.Group("/elastic")
+		{
+			elasticGroup.GET("/info", c.GetElasticInfo)
 		}
 	}
 	return r
