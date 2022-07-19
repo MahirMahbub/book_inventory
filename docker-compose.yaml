@@ -26,11 +26,13 @@ services:
 #      - ./:/book
     environment:
       PORT: "5001"
-    command: 'go run main.go'
+#    command: sh -c 'air'
     depends_on:
       - postgres
     links:
       - postgres
+    networks:
+      - share-network
   user:
     build:
       context: ./user
@@ -42,26 +44,33 @@ services:
 #        - ./:/user
     environment:
         PORT: "5002"
-    command: 'go run main.go'
+#    command: sh -c 'air'
     depends_on:
         - postgres
     links:
         - postgres
+    networks:
+      - share-network
   elasticsearch:
+    container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
     ports:
       - "9300:9300"
       - "9200:9200"
     environment:
+      - xpack.security.enabled=false
       - discovery.type=single-node
-      - http.port=9200
-      - http.cors.enabled=true
-      - http.cors.allow-origin=/https?://.+?(:[0-9]+)?/
-      - http.cors.allow-methods="OPTIONS, HEAD, GET, POST, PUT, DELETE"
-      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
-      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
-      - http.cors.allow-credentials=true
-      - bootstrap.memory_lock=true
+      - network.host=0.0.0.0
+#      - discovery.type=single-node
+#      - http.port=9200
+#      - http.cors.enabled=true
+#      - http.cors.allow-origin="*"
+#      - http.cors.allow-origin=/https?://.+?(:[0-9]+)?/
+#      - http.cors.allow-methods="OPTIONS, HEAD, GET, POST, PUT, DELETE"
+#      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+#      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+#      - http.cors.allow-credentials=true
+#      - bootstrap.memory_lock=true
       - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
@@ -99,8 +108,8 @@ services:
 #      - ./elk/postgres-jdbc-input.conf:/usr/share/logstash/config/pusher.conf:ro
     command: bash -c "/usr/share/logstash/bin/logstash-plugin install logstash-input-jdbc && logstash -f /usr/share/logstash/config/pusher.conf"
     ports:
-      - "9600:9600"
-      - "5044:5044"
+      - "9601:9601"
+      - "5045:5045"
     networks:
       - share-network
     depends_on:

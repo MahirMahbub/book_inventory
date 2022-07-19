@@ -72,6 +72,10 @@ definitions:
     - authorIds
     - title
     type: object
+  structs.ElasticJsonResponse:
+    properties:
+      data: {}
+    type: object
   structs.ErrorResponse:
     properties:
       error:
@@ -235,7 +239,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get books
+      description: get book
       parameters:
       - description: Book ID
         format: int
@@ -272,7 +276,7 @@ paths:
             $ref: '#/definitions/structs.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Show Books
+      summary: Show Book Details
       tags:
       - books
     patch:
@@ -322,6 +326,43 @@ paths:
       summary: Update a book
       tags:
       - books
+  /elastic/info:
+    get:
+      consumes:
+      - application/json
+      description: get elastic details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.ElasticJsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Elastic Info
+      tags:
+      - elastic
 securityDefinitions:
   BearerAuth:
     in: header

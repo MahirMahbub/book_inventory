@@ -70,3 +70,7 @@ type AuthorBasicResponse struct {
 type BookDeleteResponse struct {
 	Data bool `json:"data"`
 }
+
+type ElasticJsonResponse struct {
+	Data any `json:"data"`
+}
