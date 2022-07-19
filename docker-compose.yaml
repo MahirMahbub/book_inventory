@@ -116,72 +116,11 @@ services:
       - elasticsearch
       - kibana
       - postgres
-#  dejavu:
-#    image: "appbaseio/dejavu:latest"
-#    container_name: dejavu
-#    ports:
-#      - '1358:1358'
-#    links:
-#      - elasticsearch
-#    networks:
-#      - share-network
-#    depends_on:
-#        - elasticsearch
+
 volumes:
   elasticsearch_data:
   postgres_data:
-#  logstash:
-#    image: docker.elastic.co/logstash/logstash:7.3.1
-#    container_name: config
-#    volumes:
-#      - ./config/pusher.conf:/usr/share/config/config/pusher.conf:ro
-#      - ./config/config.yml:/usr/share/config/config/config.yml
-#      - ./config/jdbc/postgresql-42.2.22.jar:/usr/share/config/config-core/lib/jars/postgresql-42.2.22.jar:ro
-#    ports:
-#      - '5044:5044'
-#      - '9600:9600'
-#    networks:
-#      - indexernet
-#    command: bash -c "/usr/share/config/bin/config-plugin install config-input-jdbc && config -f /usr/share/config/config/pusher.conf"
-#    depends_on:
-#      - elasticsearch
 
-#  elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.0.1
-#    container_name: elasticsearch
-#    environment:
-#      - discovery.type=single-node
-#      - http.port=9200
-#      - http.cors.enabled=true
-#      - http.cors.allow-origin=/https?://.+?(:[0-9]+)?/
-#      - http.cors.allow-methods="OPTIONS, HEAD, GET, POST, PUT, DELETE"
-#      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
-#      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
-#      - http.cors.allow-credentials=true
-#      - bootstrap.memory_lock=true
-#      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
-#    ports:
-#      - '9200:9200'
-#      - '9300:9300'
-#    networks:
-#      - indexernet
-#    depends_on:
-#      - postgres
-#
-#  dejavu:
-#    image: appbaseio/dejavu:3.2.3
-#    container_name: dejavu
-#    ports:
-#      - '1358:1358'
-#    links:
-#      - elasticsearch
-#    networks:
-#      - indexernet
-#    depends_on:
-#      - elasticsearch
-#volumes:
-#  esdata01:
-#    driver: local
 networks:
   share-network:
     driver: bridge

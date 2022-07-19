@@ -21,10 +21,7 @@ RUN go mod download golang.org/x/tools
 RUN go mod download
 RUN go get github.com/cosmtrek/air
 COPY . .
-#CMD air
-#RUN air -c .air.toml
-#RUN air init
-#ENTRYPOINT CompileDaemon --build="go build main.go" --command=./main
+
 RUN go build -o tmpmain.exe .
 EXPOSE 5001
 CMD air
