@@ -11,3 +11,12 @@ func CreateBasicAuthorResponse(author *models.Author) structs.AuthorBasicRespons
 	customAuthor.Name = author.FirstName + " " + author.LastName
 	return customAuthor
 }
+
+func CreateAuthorObjectResponse(author models.Author) structs.AuthorResponse {
+	var authorResponse structs.AuthorResponse
+	authorResponse.ID = author.ID
+	authorResponse.FirstName = author.FirstName
+	authorResponse.LastName = author.LastName
+	authorResponse.Description = author.Description
+	return authorResponse
+}

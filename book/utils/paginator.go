@@ -16,14 +16,14 @@ type Param struct {
 
 // Paginator 分页返回
 type Paginator struct {
-	TotalRecord int64       `json:"total_record"`
-	TotalPage   int         `json:"total_page"`
+	TotalRecord int64       `json:"totalRecord"`
+	TotalPage   int         `json:"totalPage"`
 	Records     interface{} `json:"records"`
 	Offset      int         `json:"offset"`
 	Limit       int         `json:"limit"`
 	Page        int         `json:"page"`
-	PrevPage    int         `json:"prev_page"`
-	NextPage    int         `json:"next_page"`
+	PrevPage    int         `json:"prevPage"`
+	NextPage    int         `json:"nextPage"`
 }
 
 // Paging 分页
@@ -50,7 +50,7 @@ func Paging(p *Param, result interface{}) *Paginator {
 	var count int64
 	var offset int
 
-	go countRecords(db, result, done, &count)
+	countRecords(db, result, done, &count)
 
 	if p.Page == 1 {
 		offset = 0
@@ -72,14 +72,17 @@ func Paging(p *Param, result interface{}) *Paginator {
 	if p.Page > 1 {
 		paginator.PrevPage = p.Page - 1
 	} else {
-		paginator.PrevPage = p.Page
+		paginator.PrevPage = 0
 	}
 
 	if p.Page == paginator.TotalPage {
 		paginator.NextPage = p.Page
-	} else {
+	} else if p.Page < paginator.TotalPage {
 		paginator.NextPage = p.Page + 1
 	}
+	//else {
+	//	paginator.NextPage = nil
+	//}
 	return &paginator
 }
 
