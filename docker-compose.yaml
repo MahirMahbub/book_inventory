@@ -1,0 +1,126 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest'
+    ports:
+      - "9920:5432"
+    environment:
+#      - TZ=Asia/Dhaka
+      - POSTGRES_DB=gorm
+      - POSTGRES_USER=gorm
+      - POSTGRES_PASSWORD=gorm
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/:/docker-entrypoint-initdb.d/
+#    tty: true
+    networks:
+      - share-network
+  book:
+    build:
+      context: ./book
+      dockerfile: Dockerfile
+    env_file: ./book/.env
+    ports:
+      - "5001:5001"
+#    volumes:
+#      - ./:/book
+    environment:
+      PORT: "5001"
+#    command: sh -c 'air'
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    networks:
+      - share-network
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    env_file: ./user/.env
+    ports:
+        - "5002:5002"
+#    volumes:
+#        - ./:/user
+    environment:
+        PORT: "5002"
+#    command: sh -c 'air'
+    depends_on:
+        - postgres
+    links:
+        - postgres
+    networks:
+      - share-network
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+    ports:
+      - "9300:9300"
+      - "9200:9200"
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - network.host=0.0.0.0
+#      - discovery.type=single-node
+#      - http.port=9200
+#      - http.cors.enabled=true
+#      - http.cors.allow-origin="*"
+#      - http.cors.allow-origin=/https?://.+?(:[0-9]+)?/
+#      - http.cors.allow-methods="OPTIONS, HEAD, GET, POST, PUT, DELETE"
+#      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
+#      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+#      - http.cors.allow-credentials=true
+#      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - share-network
+    depends_on:
+      - postgres
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.3.2
+    ports:
+      - "5601:5601"
+    networks:
+      - share-network
+    depends_on:
+      - elasticsearch
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.3.1
+    container_name: logstash
+    volumes:
+      - ./elk/pusher.conf:/usr/share/logstash/config/pusher.conf:ro
+      - ./elk/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./elk/postgresql-42.2.8.jar:/usr/share/logstash/logstash-core/lib/jars/postgresql-42.2.8.jar:ro
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./elk
+#    environment:
+#      - LOGSTASH_JDBC_URL=jdbc:postgresql://gorm:gorm@192.168.0.106:9920/postgres?sslmode=disable&TimeZone=Asia/Dhaka
+#      - LOGSTASH_JDBC_DRIVER=org.postgresql.Driver
+#      - LOGSTASH_JDBC_DRIVER_JAR_LOCATION=/usr/share/logstash/logstash-core/lib/jars/postgresql.jar
+#      - LOGSTASH_JDBC_USERNAME=postgres
+#      - LOGSTASH_JDBC_PASSWORD=passwordnyaPostgres
+#      - LOGSTASH_ELASTICSEARCH_HOST=http://elasticsearch:9200
+#    volumes:
+#      - ./elk/postgres-jdbc-input.conf:/usr/share/logstash/pipeline/logstash.conf
+#      - ./elk/postgres-jdbc-input.conf:/usr/share/logstash/config/pusher.conf:ro
+    command: bash -c "/usr/share/logstash/bin/logstash-plugin install logstash-input-jdbc && logstash -f /usr/share/logstash/config/pusher.conf"
+    ports:
+      - "9601:9601"
+      - "5045:5045"
+    networks:
+      - share-network
+    depends_on:
+      - elasticsearch
+      - kibana
+      - postgres
+
+volumes:
+  elasticsearch_data:
+  postgres_data:
+
+networks:
+  share-network:
+    driver: bridge

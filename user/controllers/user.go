@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"go_practice/user/auth"
 	"go_practice/user/logger"
 	"go_practice/user/models"
@@ -11,6 +11,7 @@ import (
 	"go_practice/user/structs"
 	_ "go_practice/user/structs"
 	"go_practice/user/utils"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 )
@@ -43,11 +44,11 @@ func (c *Controller) RegisterUser(context *gin.Context) {
 			errors.New("user with email already registered"), logger.ERROR)
 		return
 	}
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		utils.CustomErrorResponse(context, http.StatusBadRequest,
-			"user can not be registered. operation is not allowed", err, logger.ERROR)
-		return
-	}
+	//if !errors.Is(err, gorm.ErrRecordNotFound) {
+	//	utils.CustomErrorResponse(context, http.StatusBadRequest,
+	//		"user can not be registered. operation is not allowed", err, logger.ERROR)
+	//	return
+	//}
 	if err := user.HashPassword(user.Password); err != nil {
 		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.ERROR)
 		return
@@ -207,12 +208,12 @@ func (c *Controller) VerifyUser(context *gin.Context) {
 			utils.CustomErrorResponse(context, http.StatusBadRequest, "user is not found", err, logger.INFO)
 			return
 		}
-		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
-		return
+		//utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		//return
 	}
 
 	err_ := token.GetNonAuthTokenByVerifyToken(verifyToken)
-	if gorm.IsRecordNotFoundError(err_) {
+	if errors.Is(err_, gorm.ErrRecordNotFound) {
 		err_ = errors.New("old verify token provided")
 		utils.CustomErrorResponse(context, http.StatusBadRequest,
 			"this link is invalid or old.", err_, logger.INFO)
@@ -224,7 +225,8 @@ func (c *Controller) VerifyUser(context *gin.Context) {
 	}
 
 	if err := user.UpdateUserActive(claim.Email); err != nil {
-		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		fmt.Println(err)
+		utils.CustomErrorResponse(context, http.StatusForbidden, "can not active, operation is not allowed", err, logger.ERROR)
 		return
 	}
 
@@ -276,7 +278,7 @@ func (c *Controller) ChangePassword(context *gin.Context) {
 	}
 
 	err_ := token.GetNonAuthTokenByPasswordChangeToken(verifyToken)
-	if gorm.IsRecordNotFoundError(err_) {
+	if errors.Is(err_, gorm.ErrRecordNotFound) {
 		err_ = errors.New("old verify token provided")
 		utils.CustomErrorResponse(context, http.StatusBadRequest,
 			"this link is invalid or old.", err_, logger.INFO)

@@ -1,7 +1,8 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
+	"go_practice/book/structs"
+	"gorm.io/gorm"
 )
 
 type Book struct {
@@ -14,20 +15,6 @@ type Book struct {
 
 type Books []Book
 
-type Author struct {
-	gorm.Model
-	FirstName   string  `json:"first_name" gorm:"not null"`
-	LastName    string  `json:"last_name" gorm:"not null"`
-	Description string  `gorm:"size:6000" json:"description"`
-	Books       []*Book `gorm:"many2many:authors_books;" json:"books"`
-	Contact     []*AuthorContact
-}
-type AuthorContact struct {
-	gorm.Model
-	Platform string `json:"platform"`
-	URL      string `json:"url"`
-}
-
 func (book *Book) GetUserBookByID(ID uint, userID uint) (err error) {
 	return DB.Where("id = ? AND user_id = ?", ID, userID).First(&book).Error
 }
@@ -38,4 +25,16 @@ func (books *Books) GetUserBooksBySelection(userID uint, selection []string) *go
 
 func (book *Book) GetUserBookWithAuthor(ID uint, userID uint) (err error) {
 	return DB.Preload("Authors").Where("id = ? AND user_id = ?", ID, userID).First(&book).Error
+}
+
+func (book *Book) CreateUserBookWithAuthor(authors []Author) (err error) {
+	return DB.Create(&book).Association("Authors").Append(authors)
+}
+
+func (book *Book) UpdateBook(input structs.UpdateBookInput) (err error) {
+	return DB.Model(&book).Updates(input).Error
+}
+
+func (book *Book) DeleteBook() (err error) {
+	return DB.Delete(&book).Error
 }

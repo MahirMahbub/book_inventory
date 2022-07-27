@@ -1,0 +1,9 @@
+[GIN-debug] GET    /api/v1/books/:id         --> go_practice/book/controllers.(*Controller).FindBook-fm (5 handlers)
+[GIN-debug] GET    /api/v1/books             --> go_practice/book/controllers.(*Controller).FindBooks-fm (5 handlers)
+[GIN-debug] POST   /api/v1/books             --> go_practice/book/controllers.(*Controller).CreateBook-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/books/:id         --> go_practice/book/controllers.(*Controller).DeleteBook-fm (5 handlers)
+[GIN-debug] PATCH  /api/v1/books/:id         --> go_practice/book/controllers.(*Controller).UpdateBook-fm (5 handlers)
+[GIN-debug] GET    /swagger/*any             --> github.com/swaggo/gin-swagger.CustomWrapHandler.func1 (4 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :5001
