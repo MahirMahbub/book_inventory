@@ -14,6 +14,7 @@
   - Update Book
   - Delete Book
   - Post Author by admin
+  - Get Author
 - user service
   - JWT Authentication
     - Register
@@ -25,6 +26,6 @@
     - User Verification and Password Change Multiple Token-link Detection
  - elastic search
    - Indexing book and author
-   - Get paginated authors by name search(fuzzy search)
+   - Get paginated Authors by name search(fuzzy search)
 
     
