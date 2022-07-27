@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
-	es7 "github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
 	"go_practice/book/auth"
 	"go_practice/book/logger"
@@ -11,7 +9,6 @@ import (
 	"go_practice/book/structs"
 	"go_practice/book/utils"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -37,6 +34,7 @@ func (c *Controller) FindBooks(context *gin.Context) {
 	var books models.Books
 	var err error
 	var page, limit int
+	var db *gorm.DB
 	tokenString := context.GetHeader("Authorization")
 	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
@@ -53,7 +51,6 @@ func (c *Controller) FindBooks(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'limit' param value type, Integer expected", err, logger.INFO)
 		return
 	}
-	var db *gorm.DB
 
 	if db = books.GetUserBooksBySelection(claim.UserId, []string{"id", "title"}); db.Error != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -136,6 +133,8 @@ func (c *Controller) FindBook(context *gin.Context) {
 // @Security BearerAuth
 func (c *Controller) CreateBook(context *gin.Context) {
 	var input structs.CreateBookInput
+	var authors []models.Author
+	var book models.Book
 
 	if err := context.ShouldBindJSON(&input); err != nil {
 		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
@@ -148,7 +147,6 @@ func (c *Controller) CreateBook(context *gin.Context) {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
 	}
-	var authors []models.Author
 
 	for _, authorId := range input.AuthorIDs {
 		var author models.Author
@@ -160,10 +158,9 @@ func (c *Controller) CreateBook(context *gin.Context) {
 		authors = append(authors, author)
 	}
 
-	var book models.Book
 	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
 
-	if err := models.DB.Create(&book).Association("Authors").Append(authors); err != nil {
+	if err := book.CreateUserBookWithAuthor(authors); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not created", err, logger.ERROR)
 		return
 	}
@@ -188,15 +185,20 @@ func (c *Controller) CreateBook(context *gin.Context) {
 // @Router       /books/{id} [patch]
 // @Security BearerAuth
 func (c *Controller) UpdateBook(context *gin.Context) {
+	var id_ int
 	var book models.Book
+	var input structs.UpdateBookInput
 	tokenString := context.GetHeader("Authorization")
 	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
 	}
-
-	if err := models.DB.Where("id = ? AND user_id = ?", context.Param("id"), claim.UserId).First(&book).Error; err != nil {
+	if id_, err = strconv.Atoi(context.Param("id")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "book can not be updated, invalid id", err, logger.INFO)
+		return
+	}
+	if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 			return
@@ -205,20 +207,17 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 		return
 	}
 
-	var input structs.UpdateBookInput
-
 	if err := context.ShouldBindJSON(&input); err != nil {
 		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 		return
 	}
 
-	if err := models.DB.Model(&book).Updates(input).Error; err != nil {
+	if err := book.UpdateBook(input); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not updated", err, logger.ERROR)
 		return
 	}
 	bookResponse := utils.CreateBookObjectResponse(book)
 	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
-
 }
 
 // DeleteBook godoc
@@ -238,14 +237,18 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 // @Security BearerAuth
 func (c *Controller) DeleteBook(context *gin.Context) {
 	var book models.Book
+	var id_ int
 	tokenString := context.GetHeader("Authorization")
 	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
 	}
-
-	if err := models.DB.Where("id = ? AND user_id = ?", context.Param("id"), claim.UserId).First(&book).Error; err != nil {
+	if id_, err = strconv.Atoi(context.Param("id")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "book can not be updated, invalid id", err, logger.INFO)
+		return
+	}
+	if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 			return
@@ -254,40 +257,9 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 		return
 	}
 
-	if err := models.DB.Delete(&book).Error; err != nil {
+	if err := book.DeleteBook(); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not deleted", err, logger.ERROR)
 		return
 	}
-
 	context.JSON(http.StatusNoContent, gin.H{"data": true})
-}
-
-// GetElasticInfo godoc
-// @Summary      Get Elastic Info
-// @Description  get elastic details
-// @Tags         elastic
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  structs.ElasticJsonResponse
-// @Failure      400  {object}  structs.ErrorResponse
-// @Failure      401  {object}  structs.ErrorResponse
-// @Failure      403  {object}  structs.ErrorResponse
-// @Failure      404  {object}  structs.ErrorResponse
-// @Failure      500  {object}  structs.ErrorResponse
-// @Router       /elastic/info [get]
-// @Security BearerAuth
-func (c *Controller) GetElasticInfo(context *gin.Context) {
-	es := context.MustGet("elastic").(*es7.Client)
-	var r map[string]interface{}
-	//fmt.Println(client.Index())
-	//fmt.Println(es7.Count())
-	//log.Println(es7.Info())
-	res, err := es.Info()
-	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
-	}
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		log.Fatalf("Error parsing the response body: %s", err)
-	}
-	context.JSON(http.StatusOK, gin.H{"data": r})
 }

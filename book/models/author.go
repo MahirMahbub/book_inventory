@@ -15,3 +15,7 @@ type Author struct {
 func (author *Author) GetAuthorByID(ID uint) (err error) {
 	return DB.Where("id = ?", ID).First(&author).Error
 }
+
+func (author *Author) CreateBook() (err error) {
+	return DB.Create(&author).Error
+}

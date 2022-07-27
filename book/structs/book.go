@@ -5,17 +5,16 @@ type CreateBookInput struct {
 	AuthorIDs   []uint `json:"authorIds" binding:"required"`
 	Description string `json:"description"`
 }
-type T struct {
-	As []int `json:"as"`
-}
 
 type UpdateBookInput struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
+
 type BooksPaginatedResponse struct {
 	Data struct {
 		TotalRecord int `json:"totalRecord"`
@@ -36,6 +35,7 @@ type BookBase struct {
 	ID    uint   `json:"id"`
 	Title string `json:"title"`
 }
+
 type BookBaseResponse struct {
 	BookBase
 	UserID      uint   `json:"userId"`

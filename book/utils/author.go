@@ -64,3 +64,21 @@ func CreateHyperPaginatedAuthorResponses(page int, limit int, authorStructData [
 	paginatedResponse.Records = authorStructData
 	return paginatedResponse
 }
+
+func CreateAuthorListSearchResponse(input map[string]interface{}) []structs.AuthorBase {
+	var authorsData []structs.AuthorBase
+	authorsData = []structs.AuthorBase{}
+	if len(input) > 0 {
+		dataList := input["hits"].(map[string]interface{})["hits"].([]interface{})
+
+		for i := 0; i < len(dataList); i++ {
+			var authorDetails structs.AuthorBase
+			sources := dataList[i].(map[string]interface{})["_source"].(map[string]interface{})
+			authorDetails.ID = uint(sources["id"].(float64))
+			authorDetails.FirstName = sources["first_name"].(string)
+			authorDetails.LastName = sources["last_name"].(string)
+			authorsData = append(authorsData, authorDetails)
+		}
+	}
+	return authorsData
+}

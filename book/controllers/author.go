@@ -2,17 +2,15 @@ package controllers
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
-	es7 "github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
 	"go_practice/book/auth"
+	"go_practice/book/elasticsearch"
 	"go_practice/book/logger"
 	"go_practice/book/models"
 	"go_practice/book/structs"
 	"go_practice/book/utils"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -49,7 +47,7 @@ func (c *Controller) CreateAuthor(context *gin.Context) {
 	var author models.Author
 	author = models.Author{FirstName: input.FirstName, LastName: input.LastName, Description: input.Description}
 
-	if err := models.DB.Create(&author).Error; err != nil {
+	if err := author.CreateBook(); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "author is not created", err, logger.ERROR)
 		return
 	}
@@ -102,71 +100,9 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 
 	from := (page - 1) * limit
 	//fmt.Println(search, from, limit)
-	query := map[string]interface{}{
-		"from": from,
-		"size": limit,
-		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"should": []interface{}{
-					map[string]interface{}{
-						"match": map[string]interface{}{
-							"first_name": map[string]interface{}{
-								"query":         search,
-								"fuzziness":     "AUTO",
-								"prefix_length": 1,
-							},
-						},
-					},
-					map[string]interface{}{
-						"match": map[string]interface{}{
-							"last_name": map[string]interface{}{
-								"query":         search,
-								"fuzziness":     "AUTO",
-								"prefix_length": 1,
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-	if err := json.NewEncoder(&buf).Encode(query); err != nil {
-		log.Fatalf("Error encoding query: %s", err)
-	}
+	r, err := elasticsearch.GetPaginatedAuthorSearch(context, from, limit, search, buf, err)
 
-	es := context.MustGet("elastic").(*es7.Client)
-	var r map[string]interface{}
-	res, err := es.Search(
-		es.Search.WithBody(&buf),
-		es.Search.WithPretty(),
-		es.Search.WithIndex("authors"),
-		es.Search.WithTrackTotalHits(false),
-		es.Search.WithFilterPath("hits.hits._source.last_name",
-			"hits.hits._source.first_name",
-			"hits.hits._source.id"),
-	)
-	if err != nil {
-		log.Fatalf("Error getting response: %s", err)
-	}
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		log.Fatalf("Error parsing the response body: %s", err)
-	}
-	var authorsData []structs.AuthorBase
-	authorsData = []structs.AuthorBase{}
-	if len(r) > 0 {
-		dataList := r["hits"].(map[string]interface{})["hits"].([]interface{})
-
-		for i := 0; i < len(dataList); i++ {
-			var authorDetails structs.AuthorBase
-			sources := dataList[i].(map[string]interface{})["_source"].(map[string]interface{})
-			//fmt.Println(sources)
-			authorDetails.ID = uint(sources["id"].(float64))
-			authorDetails.FirstName = sources["first_name"].(string)
-			authorDetails.LastName = sources["last_name"].(string)
-			authorsData = append(authorsData, authorDetails)
-			//fmt.Println(authorDetails.ID, authorDetails.FirstName, authorDetails.LastName)
-		}
-	}
+	authorsData := utils.CreateAuthorListSearchResponse(r)
 	authorStructData := utils.CreateHyperAuthorResponses(context, authorsData)
 
 	paginatedResponse := utils.CreateHyperPaginatedAuthorResponses(page, limit, authorStructData)
