@@ -64,7 +64,8 @@ func (c *Controller) CreateAuthor(context *gin.Context) {
 //@Produce      json
 //@Param        page   query  int  false "paginate" Format(int)
 //@Param        limit   query  int  false "paginate" Format(int)
-//@Success      200  {object}  structs.BooksPaginatedResponse
+//@Param        search   query  string  false "name searching" Format(string)
+//@Success      200  {object}  structs.AuthorPaginatedResponse
 //@Failure      400  {object}  structs.ErrorResponse
 //@Failure      401  {object}  structs.ErrorResponse
 //@Failure      403  {object}  structs.ErrorResponse
@@ -104,11 +105,24 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 		"from": from,
 		"size": limit,
 		"query": map[string]interface{}{
-			"match": map[string]interface{}{
-				"first_name": map[string]interface{}{
-					"query":         search,
-					"fuzziness":     2,
-					"prefix_length": 1,
+			"bool": map[string]interface{}{
+				"should": []interface{}{
+					map[string]interface{}{
+						"match": map[string]interface{}{
+							"first_name": map[string]interface{}{
+								"query":     search,
+								"fuzziness": 4,
+							},
+						},
+					},
+					map[string]interface{}{
+						"match": map[string]interface{}{
+							"last_name": map[string]interface{}{
+								"query":     search,
+								"fuzziness": 4,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -123,7 +137,10 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 		es.Search.WithBody(&buf),
 		es.Search.WithPretty(),
 		es.Search.WithIndex("authors"),
-		es.Search.WithTrackTotalHits(true),
+		es.Search.WithTrackTotalHits(false),
+		es.Search.WithFilterPath("hits.hits._source.last_name",
+			"hits.hits._source.first_name",
+			"hits.hits._source.id"),
 	)
 	if err != nil {
 		log.Fatalf("Error getting response: %s", err)
@@ -131,25 +148,30 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
 		log.Fatalf("Error parsing the response body: %s", err)
 	}
-	//if db = books.GetUserBooksBySelection(claim.UserId, []string{"id", "title"}); db.Error != nil {
-	//	if errors.Is(err, gorm.ErrRecordNotFound) {
-	//		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
-	//		return
-	//	}
-	//	utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
-	//	return
-	//}
-	//paginator := utils.Paging(&utils.Param{
-	//	DB:      db,
-	//	Page:    page,
-	//	Limit:   limit,
-	//	OrderBy: []string{"id desc"},
-	//	ShowSQL: true,
-	//}, &books)
-	//bookResponses := utils.CreateHyperBookResponses(context, books)
-	//
-	//paginator.Records = bookResponses
-	context.JSON(http.StatusOK, gin.H{"data": r})
+	var authorsData []structs.AuthorBase
+	authorsData = []structs.AuthorBase{}
+	if len(r) > 0 {
+		dataList := r["hits"].(map[string]interface{})["hits"].([]interface{})
+
+		for i := 0; i < len(dataList); i++ {
+			var authorDetails structs.AuthorBase
+			sources := dataList[i].(map[string]interface{})["_source"].(map[string]interface{})
+			fmt.Println(sources)
+			authorDetails.ID = uint(sources["id"].(float64))
+			authorDetails.FirstName = sources["first_name"].(string)
+			authorDetails.LastName = sources["last_name"].(string)
+			authorsData = append(authorsData, authorDetails)
+			fmt.Println(authorDetails.ID, authorDetails.FirstName, authorDetails.LastName)
+		}
+	}
+	authorStructData := utils.CreateHyperAuthorResponses(context, authorsData)
+
+	paginatedResponse := utils.CreateHyperPaginatedAuthorResponses(page, limit, authorStructData)
+
+	context.JSON(
+		http.StatusOK,
+		gin.H{"data": paginatedResponse},
+	)
 }
 
 // FindBook godoc

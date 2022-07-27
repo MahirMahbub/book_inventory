@@ -2,9 +2,42 @@ basePath: /api/v1
 definitions:
   structs.AuthorBasicResponse:
     properties:
+      firstName:
+        type: string
       id:
         type: integer
+      lastName:
+        type: string
       name:
+        type: string
+    type: object
+  structs.AuthorPaginatedResponse:
+    properties:
+      data:
+        properties:
+          limit:
+            type: integer
+          next_page:
+            type: integer
+          page:
+            type: integer
+          prev_page:
+            type: integer
+          records:
+            items:
+              $ref: '#/definitions/structs.HyperAuthorResponse'
+            type: array
+        type: object
+    type: object
+  structs.AuthorResponse:
+    properties:
+      description:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
         type: string
     type: object
   structs.BookDeleteResponse:
@@ -33,13 +66,13 @@ definitions:
         properties:
           limit:
             type: integer
-          next_page:
+          nextPage:
             type: integer
           offset:
             type: integer
           page:
             type: integer
-          prev_page:
+          prevPage:
             type: integer
           records:
             items:
@@ -52,11 +85,22 @@ definitions:
                   type: string
               type: object
             type: array
-          total_page:
+          totalPage:
             type: integer
-          total_record:
+          totalRecord:
             type: integer
         type: object
+    type: object
+  structs.CreateAuthorInput:
+    properties:
+      description:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    required:
+    - first_name
     type: object
   structs.CreateBookInput:
     properties:
@@ -81,6 +125,17 @@ definitions:
       error:
         type: string
     type: object
+  structs.HyperAuthorResponse:
+    properties:
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      url:
+        type: string
+    type: object
   structs.UpdateBookInput:
     properties:
       description:
@@ -101,6 +156,103 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /admin/authors:
+    post:
+      consumes:
+      - application/json
+      description: post author by admin
+      parameters:
+      - description: Add authors
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/structs.CreateAuthorInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/structs.AuthorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add an author
+      tags:
+      - admin/authors
+  /authors:
+    get:
+      consumes:
+      - application/json
+      description: get authors
+      parameters:
+      - description: paginate
+        format: int
+        in: query
+        name: page
+        type: integer
+      - description: paginate
+        format: int
+        in: query
+        name: limit
+        type: integer
+      - description: name searching
+        format: string
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.AuthorPaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Show Authors
+      tags:
+      - authors
   /books:
     get:
       consumes:

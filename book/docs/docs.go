@@ -24,6 +24,156 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/authors": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "post author by admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin/authors"
+                ],
+                "summary": "Add an author",
+                "parameters": [
+                    {
+                        "description": "Add authors",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/structs.CreateAuthorInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/structs.AuthorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/authors": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get authors",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authors"
+                ],
+                "summary": "Show Authors",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "paginate",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "paginate",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "string",
+                        "description": "name searching",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.AuthorPaginatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/books": {
             "get": {
                 "security": [
@@ -435,10 +585,61 @@ const docTemplate = `{
         "structs.AuthorBasicResponse": {
             "type": "object",
             "properties": {
+                "firstName": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
+                "lastName": {
+                    "type": "string"
+                },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.AuthorPaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "integer"
+                        },
+                        "next_page": {
+                            "type": "integer"
+                        },
+                        "page": {
+                            "type": "integer"
+                        },
+                        "prev_page": {
+                            "type": "integer"
+                        },
+                        "records": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.HyperAuthorResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "structs.AuthorResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastName": {
                     "type": "string"
                 }
             }
@@ -483,7 +684,7 @@ const docTemplate = `{
                         "limit": {
                             "type": "integer"
                         },
-                        "next_page": {
+                        "nextPage": {
                             "type": "integer"
                         },
                         "offset": {
@@ -492,7 +693,7 @@ const docTemplate = `{
                         "page": {
                             "type": "integer"
                         },
-                        "prev_page": {
+                        "prevPage": {
                             "type": "integer"
                         },
                         "records": {
@@ -512,13 +713,30 @@ const docTemplate = `{
                                 }
                             }
                         },
-                        "total_page": {
+                        "totalPage": {
                             "type": "integer"
                         },
-                        "total_record": {
+                        "totalRecord": {
                             "type": "integer"
                         }
                     }
+                }
+            }
+        },
+        "structs.CreateAuthorInput": {
+            "type": "object",
+            "required": [
+                "first_name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
                 }
             }
         },
@@ -553,6 +771,23 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "structs.HyperAuthorResponse": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
