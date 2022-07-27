@@ -1,6 +1,7 @@
 package models
 
 import (
+	"go_practice/book/structs"
 	"gorm.io/gorm"
 )
 
@@ -24,4 +25,16 @@ func (books *Books) GetUserBooksBySelection(userID uint, selection []string) *go
 
 func (book *Book) GetUserBookWithAuthor(ID uint, userID uint) (err error) {
 	return DB.Preload("Authors").Where("id = ? AND user_id = ?", ID, userID).First(&book).Error
+}
+
+func (book *Book) CreateUserBookWithAuthor(authors []Author) (err error) {
+	return DB.Create(&book).Association("Authors").Append(authors)
+}
+
+func (book *Book) UpdateBook(input structs.UpdateBookInput) (err error) {
+	return DB.Model(&book).Updates(input).Error
+}
+
+func (book *Book) DeleteBook() (err error) {
+	return DB.Delete(&book).Error
 }
