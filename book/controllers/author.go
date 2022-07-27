@@ -3,7 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	es7 "github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
 	"go_practice/book/auth"
@@ -11,6 +11,7 @@ import (
 	"go_practice/book/models"
 	"go_practice/book/structs"
 	"go_practice/book/utils"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -100,7 +101,7 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 	search = context.DefaultQuery("search", "")
 
 	from := (page - 1) * limit
-	fmt.Println(search, from, limit)
+	//fmt.Println(search, from, limit)
 	query := map[string]interface{}{
 		"from": from,
 		"size": limit,
@@ -110,16 +111,18 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 					map[string]interface{}{
 						"match": map[string]interface{}{
 							"first_name": map[string]interface{}{
-								"query":     search,
-								"fuzziness": 4,
+								"query":         search,
+								"fuzziness":     "AUTO",
+								"prefix_length": 1,
 							},
 						},
 					},
 					map[string]interface{}{
 						"match": map[string]interface{}{
 							"last_name": map[string]interface{}{
-								"query":     search,
-								"fuzziness": 4,
+								"query":         search,
+								"fuzziness":     "AUTO",
+								"prefix_length": 1,
 							},
 						},
 					},
@@ -156,12 +159,12 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 		for i := 0; i < len(dataList); i++ {
 			var authorDetails structs.AuthorBase
 			sources := dataList[i].(map[string]interface{})["_source"].(map[string]interface{})
-			fmt.Println(sources)
+			//fmt.Println(sources)
 			authorDetails.ID = uint(sources["id"].(float64))
 			authorDetails.FirstName = sources["first_name"].(string)
 			authorDetails.LastName = sources["last_name"].(string)
 			authorsData = append(authorsData, authorDetails)
-			fmt.Println(authorDetails.ID, authorDetails.FirstName, authorDetails.LastName)
+			//fmt.Println(authorDetails.ID, authorDetails.FirstName, authorDetails.LastName)
 		}
 	}
 	authorStructData := utils.CreateHyperAuthorResponses(context, authorsData)
@@ -174,45 +177,45 @@ func (c *Controller) FindAuthors(context *gin.Context) {
 	)
 }
 
-// FindBook godoc
-// @Summary      Show Book Details
-// @Description  get book
-// @Tags         books
+// FindAuthor godoc
+// @Summary      Show Author Details
+// @Description  get author
+// @Tags         authors
 // @Accept       json
 // @Produce      json
-// @Param        id  path  int true "Book ID" Format(int)
-// @Success      200  {object}  structs.BookResponse
+// @Param        id  path  int true "Author ID" Format(int)
+// @Success      200  {object}  structs.AuthorAPIResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      401  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
-// @Router       /books/{id} [get]
+// @Router       /authors/{id} [get]
 // @Security BearerAuth
-//func (c *Controller) FindAuthor(context *gin.Context) {
-//	var book models.Book
-//	var id uint64
-//	var err error
-//	tokenString := context.GetHeader("Authorization")
-//	err, claim := auth.ValidateToken(tokenString)
-//	if err != nil {
-//		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
-//		return
-//	}
-//
-//	if id, err = strconv.ParseUint(context.Param("id"), 10, 32); err != nil {
-//		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'id' param value type, Integer expected", err, logger.INFO)
-//		return
-//	}
-//
-//	if err := book.GetUserBookWithAuthor(uint(id), claim.UserId); err != nil {
-//		if errors.Is(err, gorm.ErrRecordNotFound) {
-//			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
-//			return
-//		}
-//		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
-//		return
-//	}
-//	bookResponse := utils.CreateBookResponse(book)
-//	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
-//}
+func (c *Controller) FindAuthor(context *gin.Context) {
+	var author models.Author
+	var id uint64
+	var err error
+	tokenString := context.GetHeader("Authorization")
+	err, _ = auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+
+	if id, err = strconv.ParseUint(context.Param("id"), 10, 32); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'id' param value type, Integer expected", err, logger.INFO)
+		return
+	}
+
+	if err := author.GetAuthorByID(uint(id)); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusNotFound, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		return
+	}
+	authorResponse := utils.CreateAuthorObjectResponse(author)
+	context.JSON(http.StatusOK, gin.H{"data": authorResponse})
+}

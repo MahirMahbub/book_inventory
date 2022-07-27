@@ -47,6 +47,12 @@ type BookResponse struct {
 	Authors []AuthorBasicResponse `json:"authors"`
 }
 
+type BookAPIResponse struct {
+	Data struct {
+		BookResponse
+	} `json:"data"`
+}
+
 type BookUpdateResponse struct {
 	BookBaseResponse
 }

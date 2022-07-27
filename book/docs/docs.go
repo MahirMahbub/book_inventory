@@ -174,6 +174,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/authors/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get author",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authors"
+                ],
+                "summary": "Show Author Details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Author ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.AuthorAPIResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/books": {
             "get": {
                 "security": [
@@ -279,7 +347,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/structs.BookResponse"
+                            "$ref": "#/definitions/structs.BookAPIResponse"
                         }
                     },
                     "400": {
@@ -347,7 +415,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/structs.BookResponse"
+                            "$ref": "#/definitions/structs.BookAPIResponse"
                         }
                     },
                     "400": {
@@ -486,7 +554,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/structs.BookResponse"
+                            "$ref": "#/definitions/structs.BookAPIResponse"
                         }
                     },
                     "400": {
@@ -582,6 +650,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "structs.AuthorAPIResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "firstName": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "integer"
+                        },
+                        "lastName": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "structs.AuthorBasicResponse": {
             "type": "object",
             "properties": {
@@ -644,34 +734,39 @@ const docTemplate = `{
                 }
             }
         },
+        "structs.BookAPIResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "authors": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.AuthorBasicResponse"
+                            }
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "integer"
+                        },
+                        "title": {
+                            "type": "string"
+                        },
+                        "userId": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
         "structs.BookDeleteResponse": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "boolean"
-                }
-            }
-        },
-        "structs.BookResponse": {
-            "type": "object",
-            "properties": {
-                "authors": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/structs.AuthorBasicResponse"
-                    }
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
                 }
             }
         },

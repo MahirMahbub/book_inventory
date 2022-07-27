@@ -52,9 +52,9 @@ func CreateHyperPaginatedAuthorResponses(page int, limit int, authorStructData [
 	paginatedResponse.Page = page
 	paginatedResponse.Limit = limit
 	if len(authorStructData) < limit {
-		paginatedResponse.NextPage = page + 1
-	} else {
 		paginatedResponse.NextPage = 0
+	} else {
+		paginatedResponse.NextPage = page + 1
 	}
 	if page > 1 {
 		paginatedResponse.PrevPage = page - 1

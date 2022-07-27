@@ -74,7 +74,7 @@ func SetupRouter() *gin.Engine {
 		}
 		authorGroup := v1.Group("/authors").Use(middlewares.Auth())
 		{
-			//	authorGroup.GET(":id", c.FindAuthor)
+			authorGroup.GET(":id", c.FindAuthor)
 			authorGroup.GET("", c.FindAuthors)
 		}
 	}
