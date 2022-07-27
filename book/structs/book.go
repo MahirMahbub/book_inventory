@@ -18,8 +18,8 @@ type ErrorResponse struct {
 }
 type BooksPaginatedResponse struct {
 	Data struct {
-		TotalRecord int `json:"total_record"`
-		TotalPage   int `json:"total_page"`
+		TotalRecord int `json:"totalRecord"`
+		TotalPage   int `json:"totalPage"`
 		Records     []struct {
 			BookBase
 			Url string `json:"url"`
@@ -27,8 +27,8 @@ type BooksPaginatedResponse struct {
 		Offset   int `json:"offset"`
 		Limit    int `json:"limit"`
 		Page     int `json:"page"`
-		PrevPage int `json:"prev_page"`
-		NextPage int `json:"next_page"`
+		PrevPage int `json:"prevPage"`
+		NextPage int `json:"nextPage"`
 	} `json:"data"`
 }
 
@@ -54,17 +54,6 @@ type BookUpdateResponse struct {
 type HyperBookResponse struct {
 	BookBase
 	Url string `json:"url"`
-}
-type AuthorResponse struct {
-	ID          uint   `json:"id"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Description string `json:"description"`
-}
-
-type AuthorBasicResponse struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
 }
 
 type BookDeleteResponse struct {
