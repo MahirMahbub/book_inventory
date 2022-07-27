@@ -8,6 +8,12 @@
 - Added bearer jwt auth
 ## Services
 - book service
+  - Get Book
+  - Post Book
+  - Get paginated Books
+  - Update Book
+  - Delete Book
+  - Post Author by admin
 - user service
   - JWT Authentication
     - Register
@@ -18,7 +24,7 @@
     - Refresh Token Automatic Reuse Detection
     - User Verification and Password Change Multiple Token-link Detection
  - elastic search
-   - details
-   - \* added soon
+   - Indexing book and author
+   - Get paginated authors by name search(fuzzy search)
 
     
