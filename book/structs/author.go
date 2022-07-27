@@ -21,6 +21,11 @@ type AuthorResponse struct {
 	AuthorBase
 	Description string `json:"description"`
 }
+type AuthorAPIResponse struct {
+	Data struct {
+		AuthorResponse
+	} `json:"data"`
+}
 
 type AuthorBasicResponse struct {
 	AuthorBase

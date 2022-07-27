@@ -1,5 +1,19 @@
 basePath: /api/v1
 definitions:
+  structs.AuthorAPIResponse:
+    properties:
+      data:
+        properties:
+          description:
+            type: string
+          firstName:
+            type: string
+          id:
+            type: integer
+          lastName:
+            type: string
+        type: object
+    type: object
   structs.AuthorBasicResponse:
     properties:
       firstName:
@@ -40,25 +54,28 @@ definitions:
       lastName:
         type: string
     type: object
+  structs.BookAPIResponse:
+    properties:
+      data:
+        properties:
+          authors:
+            items:
+              $ref: '#/definitions/structs.AuthorBasicResponse'
+            type: array
+          description:
+            type: string
+          id:
+            type: integer
+          title:
+            type: string
+          userId:
+            type: integer
+        type: object
+    type: object
   structs.BookDeleteResponse:
     properties:
       data:
         type: boolean
-    type: object
-  structs.BookResponse:
-    properties:
-      authors:
-        items:
-          $ref: '#/definitions/structs.AuthorBasicResponse'
-        type: array
-      description:
-        type: string
-      id:
-        type: integer
-      title:
-        type: string
-      userId:
-        type: integer
     type: object
   structs.BooksPaginatedResponse:
     properties:
@@ -253,6 +270,50 @@ paths:
       summary: Show Authors
       tags:
       - authors
+  /authors/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get author
+      parameters:
+      - description: Author ID
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.AuthorAPIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Show Author Details
+      tags:
+      - authors
   /books:
     get:
       consumes:
@@ -318,7 +379,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/structs.BookResponse'
+            $ref: '#/definitions/structs.BookAPIResponse'
         "400":
           description: Bad Request
           schema:
@@ -405,7 +466,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/structs.BookResponse'
+            $ref: '#/definitions/structs.BookAPIResponse'
         "400":
           description: Bad Request
           schema:
@@ -452,7 +513,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/structs.BookResponse'
+            $ref: '#/definitions/structs.BookAPIResponse'
         "400":
           description: Bad Request
           schema:

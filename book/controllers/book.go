@@ -83,7 +83,7 @@ func (c *Controller) FindBooks(context *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id  path  int true "Book ID" Format(int)
-// @Success      200  {object}  structs.BookResponse
+// @Success      200  {object}  structs.BookAPIResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      401  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
@@ -109,7 +109,7 @@ func (c *Controller) FindBook(context *gin.Context) {
 
 	if err := book.GetUserBookWithAuthor(uint(id), claim.UserId); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			utils.BaseErrorResponse(context, http.StatusNotFound, err, logger.INFO)
 			return
 		}
 		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
@@ -126,7 +126,7 @@ func (c *Controller) FindBook(context *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        input  body  structs.CreateBookInput  true  "Add books"
-// @Success      201  {object}  structs.BookResponse
+// @Success      201  {object}  structs.BookAPIResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      401  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
@@ -153,7 +153,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 	for _, authorId := range input.AuthorIDs {
 		var author models.Author
 
-		if err := models.DB.Where("id = ?", authorId).First(&author).Error; err != nil {
+		if err := author.GetAuthorByID(authorId); err != nil {
 			utils.CustomErrorResponse(context, http.StatusNotFound, "invalid Author!", err, logger.INFO)
 			return
 		}
@@ -179,7 +179,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 // @Produce      json
 // @Param        id  path  int  true  "Account ID"
 // @Param        input  body  structs.UpdateBookInput  false  "Update books"
-// @Success      200      {object}  structs.BookResponse
+// @Success      200      {object}  structs.BookAPIResponse
 // @Failure      400      {object}  structs.ErrorResponse
 // @Failure      401  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
