@@ -33,7 +33,7 @@ type AuthorBasicResponse struct {
 	Name string `json:"name"`
 }
 
-type AuthorPaginatedResponse struct {
+type AuthorElasticPaginatedResponse struct {
 	Data struct {
 		Records  []HyperAuthorResponse `json:"records"`
 		Limit    int                   `json:"limit"`

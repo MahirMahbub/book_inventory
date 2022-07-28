@@ -7,7 +7,7 @@ import (
 
 type Book struct {
 	gorm.Model
-	Title       string    `json:"title"`
+	Title       string    `json:"title" gorm:"unique"`
 	UserID      uint      `json:"userId" gorm:"default: null"`
 	Description string    `gorm:"size:6000" json:"description"`
 	Authors     []*Author `gorm:"many2many:authors_books;" json:"author"`

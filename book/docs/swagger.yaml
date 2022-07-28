@@ -25,7 +25,7 @@ definitions:
       name:
         type: string
     type: object
-  structs.AuthorPaginatedResponse:
+  structs.AuthorElasticPaginatedResponse:
     properties:
       data:
         properties:
@@ -76,6 +76,24 @@ definitions:
     properties:
       data:
         type: boolean
+    type: object
+  structs.BookElasticPaginatedResponse:
+    properties:
+      data:
+        properties:
+          limit:
+            type: integer
+          next_page:
+            type: integer
+          page:
+            type: integer
+          prev_page:
+            type: integer
+          records:
+            items:
+              $ref: '#/definitions/structs.HyperBookResponse'
+            type: array
+        type: object
     type: object
   structs.BooksPaginatedResponse:
     properties:
@@ -153,6 +171,15 @@ definitions:
       url:
         type: string
     type: object
+  structs.HyperBookResponse:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      url:
+        type: string
+    type: object
   structs.UpdateBookInput:
     properties:
       description:
@@ -217,59 +244,6 @@ paths:
       summary: Add an author
       tags:
       - admin/authors
-  /authors:
-    get:
-      consumes:
-      - application/json
-      description: get authors
-      parameters:
-      - description: paginate
-        format: int
-        in: query
-        name: page
-        type: integer
-      - description: paginate
-        format: int
-        in: query
-        name: limit
-        type: integer
-      - description: name searching
-        format: string
-        in: query
-        name: search
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/structs.AuthorPaginatedResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/structs.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/structs.ErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/structs.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/structs.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/structs.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Show Authors
-      tags:
-      - authors
   /authors/{id}:
     get:
       consumes:
@@ -539,6 +513,112 @@ paths:
       summary: Update a book
       tags:
       - books
+  /elastic/authors:
+    get:
+      consumes:
+      - application/json
+      description: get paginated list of authors by search term
+      parameters:
+      - description: paginate
+        format: int
+        in: query
+        name: page
+        type: integer
+      - description: paginate
+        format: int
+        in: query
+        name: limit
+        type: integer
+      - description: name searching
+        format: string
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.AuthorElasticPaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Show Authors by Searching
+      tags:
+      - elastic
+  /elastic/books:
+    get:
+      consumes:
+      - application/json
+      description: get paginated list of books by search term
+      parameters:
+      - description: paginate
+        format: int
+        in: query
+        name: page
+        type: integer
+      - description: paginate
+        format: int
+        in: query
+        name: limit
+        type: integer
+      - description: name searching
+        format: string
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.BookElasticPaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Show Books by Searching
+      tags:
+      - elastic
   /elastic/info:
     get:
       consumes:

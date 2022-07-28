@@ -28,7 +28,8 @@ func CreateHyperAuthorResponses(ctx *gin.Context, authors []structs.AuthorBase) 
 	if ctx.Request.TLS != nil {
 		scheme = "https"
 	}
-	url := scheme + "://" + ctx.Request.Host + ctx.Request.URL.Path + "/"
+	apiPath := "api/v1/books/"
+	url := scheme + "://" + ctx.Request.Host + apiPath
 	var bookResponses []structs.HyperAuthorResponse
 	bookResponses = []structs.HyperAuthorResponse{}
 	for _, author := range authors {

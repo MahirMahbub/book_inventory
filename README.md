@@ -10,7 +10,7 @@
 - book service
   - Get Book
   - Post Book
-  - Get paginated Books
+  - Get Paginated Books
   - Update Book
   - Delete Book
   - Post Author by admin
@@ -27,5 +27,6 @@
  - elastic search
    - Indexing book and author
    - Get paginated Authors by name search(fuzzy search)
+   - Get paginated Books by name search(fuzzy search)
 
     
