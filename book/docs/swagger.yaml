@@ -570,7 +570,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get paginated list of authors by search term
+      description: get paginated list of books by search term
       parameters:
       - description: paginate
         format: int
@@ -616,7 +616,7 @@ paths:
             $ref: '#/definitions/structs.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Show Authors by Searching
+      summary: Show Books by Searching
       tags:
       - elastic
   /elastic/info:

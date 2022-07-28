@@ -597,7 +597,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "get paginated list of authors by search term",
+                "description": "get paginated list of books by search term",
                 "consumes": [
                     "application/json"
                 ],
@@ -607,7 +607,7 @@ const docTemplate = `{
                 "tags": [
                     "elastic"
                 ],
-                "summary": "Show Authors by Searching",
+                "summary": "Show Books by Searching",
                 "parameters": [
                     {
                         "type": "integer",

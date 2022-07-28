@@ -268,8 +268,8 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 }
 
 //FindBooks godoc
-//@Summary      Show Authors by Searching
-//@Description  get paginated list of authors by search term
+//@Summary      Show Books by Searching
+//@Description  get paginated list of books by search term
 //@Tags         elastic
 //@Accept       json
 //@Produce      json
