@@ -56,25 +56,24 @@ func (c *Controller) CreateAuthor(context *gin.Context) {
 }
 
 //FindAuthors godoc
-//@Summary      Show Authors
-//@Description  get authors
-//@Tags         authors
+//@Summary      Show Authors by Searching
+//@Description  get paginated list of authors by search term
+//@Tags         elastic
 //@Accept       json
 //@Produce      json
 //@Param        page   query  int  false "paginate" Format(int)
 //@Param        limit   query  int  false "paginate" Format(int)
 //@Param        search   query  string  false "name searching" Format(string)
-//@Success      200  {object}  structs.AuthorPaginatedResponse
+//@Success      200  {object}  structs.AuthorElasticPaginatedResponse
 //@Failure      400  {object}  structs.ErrorResponse
 //@Failure      401  {object}  structs.ErrorResponse
 //@Failure      403  {object}  structs.ErrorResponse
 //@Failure      404  {object}  structs.ErrorResponse
 //@Failure      500  {object}  structs.ErrorResponse
-//@Router       /authors [get]
+//@Router       /elastic/authors [get]
 //@Security BearerAuth
 func (c *Controller) FindAuthors(context *gin.Context) {
 
-	//var books models.Author
 	var err error
 	var page, limit int
 	var search string
