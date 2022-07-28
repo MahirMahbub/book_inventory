@@ -10,7 +10,7 @@ func BookRoute(v1 *gin.RouterGroup, c *controllers.Controller) {
 	bookGroup := v1.Group("/books").Use(middlewares.Auth())
 	{
 		bookGroup.GET(":id", c.FindBook)
-		bookGroup.GET("", c.FindBooks)
+		bookGroup.GET("", c.FindUserBooks)
 		bookGroup.POST("", c.CreateBook)
 		bookGroup.DELETE(":id", c.DeleteBook)
 		bookGroup.PATCH(":id", c.UpdateBook)

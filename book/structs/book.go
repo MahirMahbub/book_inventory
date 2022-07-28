@@ -31,6 +31,24 @@ type BooksPaginatedResponse struct {
 	} `json:"data"`
 }
 
+type BookElasticPaginatedResponse struct {
+	Data struct {
+		Records  []HyperBookResponse `json:"records"`
+		Limit    int                 `json:"limit"`
+		Page     int                 `json:"page"`
+		PrevPage int                 `json:"prev_page"`
+		NextPage int                 `json:"next_page"`
+	} `json:"data"`
+}
+
+type BookPaginated struct {
+	Records  []HyperBookResponse `json:"records"`
+	Limit    int                 `json:"limit"`
+	Page     int                 `json:"page"`
+	PrevPage int                 `json:"prev_page"`
+	NextPage int                 `json:"next_page"`
+}
+
 type BookBase struct {
 	ID    uint   `json:"id"`
 	Title string `json:"title"`
