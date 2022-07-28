@@ -10,7 +10,7 @@
 - book service
   - Get Book
   - Post Book
-  - Get paginated Books
+  - Get Paginated Books
   - Update Book
   - Delete Book
   - Post Author by admin
