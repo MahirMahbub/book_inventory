@@ -27,5 +27,6 @@
  - elastic search
    - Indexing book and author
    - Get paginated Authors by name search(fuzzy search)
+   - Get paginated Books by name search(fuzzy search)
 
     
