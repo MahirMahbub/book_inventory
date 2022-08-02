@@ -501,7 +501,7 @@ paths:
       - BearerAuth: []
       summary: Update a Book by Admin
       tags:
-      - admin/book
+      - admin/books
   /authors/{id}:
     get:
       consumes:
@@ -821,7 +821,7 @@ paths:
             $ref: '#/definitions/structs.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Show Authors by Searching
+      summary: Show Authors by Searching for User
       tags:
       - elastic
   /elastic/books:
@@ -874,7 +874,7 @@ paths:
             $ref: '#/definitions/structs.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Show Books by Searching
+      summary: Show Books by Searching for User
       tags:
       - elastic
   /elastic/info:

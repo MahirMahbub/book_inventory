@@ -170,7 +170,7 @@ func (c *Controller) CreateAdminBook(context *gin.Context) {
 // UpdateAdminBook godoc
 // @Summary      Update a Book by Admin
 // @Description  patch book
-// @Tags         admin/book
+// @Tags         admin/books
 // @Accept       json
 // @Produce      json
 // @Param        id  path  int  true  "Account ID"

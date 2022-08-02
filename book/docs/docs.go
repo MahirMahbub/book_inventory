@@ -449,7 +449,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admin/book"
+                    "admin/books"
                 ],
                 "summary": "Update a Book by Admin",
                 "parameters": [
@@ -942,7 +942,7 @@ const docTemplate = `{
                 "tags": [
                     "elastic"
                 ],
-                "summary": "Show Authors by Searching",
+                "summary": "Show Authors by Searching for User",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1023,7 +1023,7 @@ const docTemplate = `{
                 "tags": [
                     "elastic"
                 ],
-                "summary": "Show Books by Searching",
+                "summary": "Show Books by Searching for User",
                 "parameters": [
                     {
                         "type": "integer",
