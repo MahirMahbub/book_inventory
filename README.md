@@ -5,7 +5,9 @@
 - Added Kibana for inspection
 - Added swagger specification
 - Added basic api for books and author
-- Added bearer jwt auth
+- Added bearer jwt auth from scratch
+- Refresh Token Automatic Reuse Detection
+- User Verification and Password Change Multiple Token-link Detection
 ## Services
 - book service
   - user
@@ -15,6 +17,7 @@
     - Update Book
     - Delete Book
     - Get Author
+
   - admin
     - Get Book
     - Post Book
@@ -23,16 +26,16 @@
     - Delete Book
     - Post Author
     - Get Author
+    - Create Admin
+    
 - user service
   - JWT Authentication
     - Register
     - Log In
-    - User Verification with Resend
-    - Password Change with Resend
+    - User Verification with Resend and Old Token Detection on Resend and Expiry.
+    - Password Change with Resend and Old Token Detection on Resend and Expiry.
     - Access Token and Refresh Token
-    - Refresh Token Automatic Reuse Detection
-    - User Verification and Password Change Multiple Token-link Detection
- - elastic search
+- elastic search
    - Indexing book and author
    - Get paginated Authors by name search(fuzzy search in first_name, last_name) (only for user)
    - Get paginated Books by name search(fuzzy search in title, author's first_name, author's last_name) (only for user)
