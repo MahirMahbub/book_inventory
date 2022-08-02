@@ -79,3 +79,17 @@ func (user *User) UpdateUserActive(email string) (err error) {
 	}
 	return nil
 }
+
+func (user *User) CreateAdmin(userId uint) (err error) {
+	if err := DB.Where("id = ?", userId).First(&user).Error; err != nil {
+		return err
+	}
+	if user.IsAdmin {
+		return errors.New("admin already activated")
+	}
+	user.IsAdmin = true
+	if err := DB.Save(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}

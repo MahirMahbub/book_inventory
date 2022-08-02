@@ -73,6 +73,50 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /admin/create-admin:
+    post:
+      consumes:
+      - application/json
+      description: create admin
+      parameters:
+      - description: User ID
+        format: int
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create admin
+      tags:
+      - admin
   /user/change-password:
     put:
       consumes:
