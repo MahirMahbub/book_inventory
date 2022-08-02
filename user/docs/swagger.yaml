@@ -73,7 +73,7 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
-  /admin/create-admin:
+  /admin/{userId}/create-admin:
     post:
       consumes:
       - application/json
@@ -81,7 +81,7 @@ paths:
       parameters:
       - description: User ID
         format: int
-        in: query
+        in: path
         name: userId
         required: true
         type: integer
@@ -396,4 +396,9 @@ paths:
       summary: Verify User
       tags:
       - user
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

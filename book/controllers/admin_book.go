@@ -13,10 +13,10 @@ import (
 	"strconv"
 )
 
-// FindUserBooks godoc
-// @Summary      Show Books
-// @Description  get books
-// @Tags         books
+// FindAdminBooks godoc
+// @Summary      Show Books to Admin
+// @Description  gets all books
+// @Tags         admin/books
 // @Accept       json
 // @Produce      json
 // @Param        page   query  int  false "paginate" Format(int)
@@ -27,16 +27,16 @@ import (
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
-// @Router       /books [get]
+// @Router       /admin/books [get]
 // @Security BearerAuth
-func (c *Controller) FindUserBooks(context *gin.Context) {
+func (c *Controller) FindAdminBooks(context *gin.Context) {
 
 	var books models.Books
 	var err error
 	var page, limit int
 	var db *gorm.DB
 	tokenString := context.GetHeader("Authorization")
-	err, claim := auth.ValidateToken(tokenString)
+	err, _ = auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -52,7 +52,7 @@ func (c *Controller) FindUserBooks(context *gin.Context) {
 		return
 	}
 
-	if db = books.GetUserBooksBySelection(claim.UserId, []string{"id", "title"}); db.Error != nil {
+	if db = books.GetBooksBySelection([]string{"id", "title"}); db.Error != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 			return
@@ -73,10 +73,10 @@ func (c *Controller) FindUserBooks(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"data": paginator})
 }
 
-// FindBook godoc
-// @Summary      Show Book Details
-// @Description  get book
-// @Tags         books
+// FindAdminBook godoc
+// @Summary      Show Book Details to Admin
+// @Description  get book by id
+// @Tags         admin/books
 // @Accept       json
 // @Produce      json
 // @Param        id  path  int true "Book ID" Format(int)
@@ -86,14 +86,14 @@ func (c *Controller) FindUserBooks(context *gin.Context) {
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
-// @Router       /books/{id} [get]
+// @Router       /admin/books/{id} [get]
 // @Security BearerAuth
-func (c *Controller) FindBook(context *gin.Context) {
+func (c *Controller) FindAdminBook(context *gin.Context) {
 	var book models.Book
 	var id uint64
 	var err error
 	tokenString := context.GetHeader("Authorization")
-	err, claim := auth.ValidateToken(tokenString)
+	err, _ = auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -104,7 +104,7 @@ func (c *Controller) FindBook(context *gin.Context) {
 		return
 	}
 
-	if err := book.GetUserBookWithAuthor(uint(id), claim.UserId); err != nil {
+	if err := book.GetBookWithAuthor(uint(id)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusNotFound, err, logger.INFO)
 			return
@@ -112,15 +112,14 @@ func (c *Controller) FindBook(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
-
 	bookResponse := utils.CreateBookResponse(book)
 	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
-// CreateBook godoc
-// @Summary      Add a book
+// CreateAdminBook godoc
+// @Summary      Add a Book by Admin
 // @Description  post book
-// @Tags         books
+// @Tags         admin/books
 // @Accept       json
 // @Produce      json
 // @Param        input  body  structs.CreateBookInput  true  "Add books"
@@ -130,9 +129,9 @@ func (c *Controller) FindBook(context *gin.Context) {
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
-// @Router       /books [post]
+// @Router       /admin/books [post]
 // @Security BearerAuth
-func (c *Controller) CreateBook(context *gin.Context) {
+func (c *Controller) CreateAdminBook(context *gin.Context) {
 	var input structs.CreateBookInput
 	var authors []models.Author
 	var book models.Book
@@ -143,7 +142,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 	}
 
 	tokenString := context.GetHeader("Authorization")
-	err, claim := auth.ValidateToken(tokenString)
+	err, _ := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -158,22 +157,20 @@ func (c *Controller) CreateBook(context *gin.Context) {
 		}
 		authors = append(authors, author)
 	}
-
-	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
+	book = models.Book{Title: input.Title, Description: input.Description}
 
 	if err := book.CreateBookWithAuthor(authors); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not created", err, logger.ERROR)
 		return
 	}
-
 	bookResponse := utils.CreateBookResponse(book)
 	context.JSON(http.StatusCreated, gin.H{"data": bookResponse})
 }
 
-// UpdateBook godoc
-// @Summary      Update a book
+// UpdateAdminBook godoc
+// @Summary      Update a Book by Admin
 // @Description  patch book
-// @Tags         books
+// @Tags         admin/book
 // @Accept       json
 // @Produce      json
 // @Param        id  path  int  true  "Account ID"
@@ -184,25 +181,23 @@ func (c *Controller) CreateBook(context *gin.Context) {
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404      {object}  structs.ErrorResponse
 // @Failure      500      {object}  structs.ErrorResponse
-// @Router       /books/{id} [patch]
+// @Router       /admin/books/{id} [patch]
 // @Security BearerAuth
-func (c *Controller) UpdateBook(context *gin.Context) {
+func (c *Controller) UpdateAdminBook(context *gin.Context) {
 	var id_ int
 	var book models.Book
 	var input structs.UpdateBookInput
 	tokenString := context.GetHeader("Authorization")
-	err, claim := auth.ValidateToken(tokenString)
+	err, _ := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
 	}
-
 	if id_, err = strconv.Atoi(context.Param("id")); err != nil {
 		utils.CustomErrorResponse(context, http.StatusBadRequest, "book can not be updated, invalid id", err, logger.INFO)
 		return
 	}
-
-	if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
+	if err := book.GetBookByID(uint(id_)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 			return
@@ -220,15 +215,14 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not updated", err, logger.ERROR)
 		return
 	}
-
 	bookResponse := utils.CreateBookObjectResponse(book)
 	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
-// DeleteBook godoc
-// @Summary      Delete a book
+// DeleteAdminBook godoc
+// @Summary      Delete a Book by Admin
 // @Description  delete book
-// @Tags         books
+// @Tags         admin/books
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "Book ID"  Format(int)
@@ -238,13 +232,13 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
-// @Router       /books/{id} [delete]
+// @Router       /admin/books/{id} [delete]
 // @Security BearerAuth
-func (c *Controller) DeleteBook(context *gin.Context) {
+func (c *Controller) DeleteAdminBook(context *gin.Context) {
 	var book models.Book
 	var id_ int
 	tokenString := context.GetHeader("Authorization")
-	err, claim := auth.ValidateToken(tokenString)
+	err, _ := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -254,7 +248,7 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 		return
 	}
 
-	if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
+	if err := book.GetBookByID(uint(id_)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
 			return
