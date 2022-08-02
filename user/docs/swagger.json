@@ -17,7 +17,7 @@
     "host": "localhost:5002",
     "basePath": "/api/v1",
     "paths": {
-        "/admin/create-admin": {
+        "/admin/{userId}/create-admin": {
             "post": {
                 "security": [
                     {
@@ -41,7 +41,7 @@
                         "format": "int",
                         "description": "User ID",
                         "name": "userId",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -600,6 +600,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

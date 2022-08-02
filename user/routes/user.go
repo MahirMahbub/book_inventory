@@ -67,7 +67,7 @@ func SetupRouter() *gin.Engine {
 		}
 		adminGroup := v1.Group("/admin").Use(middlewares.AdminAuth())
 		{
-			adminGroup.POST("/create-admin", c.CreateAdmin)
+			adminGroup.POST(":userId/create-admin", c.CreateAdmin)
 		}
 	}
 	return r

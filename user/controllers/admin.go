@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go_practice/user/auth"
 	"go_practice/user/logger"
@@ -18,14 +19,14 @@ import (
 // @Tags         admin
 // @Accept       json
 // @Produce      json
-// @Param        userId  query  int true "User ID" Format(int)
+// @Param        userId  path  int true "User ID" Format(int)
 // @Success      200  {object}  structs.MessageResponse
 // @Failure      400  {object}  structs.ErrorResponse
 // @Failure      401  {object}  structs.ErrorResponse
 // @Failure      403  {object}  structs.ErrorResponse
 // @Failure      404  {object}  structs.ErrorResponse
 // @Failure      500  {object}  structs.ErrorResponse
-// @Router       /admin/create-admin [post]
+// @Router       /admin/{userId}/create-admin [post]
 // @Security BearerAuth
 func (c *Controller) CreateAdmin(context *gin.Context) {
 	var id int
@@ -38,6 +39,7 @@ func (c *Controller) CreateAdmin(context *gin.Context) {
 	}
 	if id, err = strconv.Atoi(context.Param("userId")); err != nil {
 		utils.CustomErrorResponse(context, http.StatusBadRequest, "book can not be updated, invalid id", err, logger.INFO)
+		fmt.Println(err.Error(), context)
 		return
 	}
 	if claim.IsAdmin {

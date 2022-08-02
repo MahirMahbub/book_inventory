@@ -79,7 +79,7 @@ func CreateHyperBookElasticResponses(ctx *gin.Context, books []structs.BookBase)
 
 }
 
-func CreateBookListSearchResponse(input map[string]interface{}) []structs.BookBase {
+func CreateBookListSearchResponse(input map[string]interface{}, userId uint) []structs.BookBase {
 	var booksData []structs.BookBase
 	booksData = []structs.BookBase{}
 	if len(input) > 0 {
@@ -88,9 +88,11 @@ func CreateBookListSearchResponse(input map[string]interface{}) []structs.BookBa
 		for i := 0; i < len(dataList); i++ {
 			var bookDetails structs.BookBase
 			sources := dataList[i].(map[string]interface{})["_source"].(map[string]interface{})
-			bookDetails.ID = uint(sources["book_id"].(float64))
-			bookDetails.Title = sources["title"].(string)
-			booksData = append(booksData, bookDetails)
+			if sources["user_id"] == nil || sources["user_id"] == userId {
+				bookDetails.ID = uint(sources["book_id"].(float64))
+				bookDetails.Title = sources["title"].(string)
+				booksData = append(booksData, bookDetails)
+			}
 		}
 	}
 	return booksData
