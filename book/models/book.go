@@ -31,15 +31,15 @@ func (books *Books) GetBooksBySelection(selection []string) *gorm.DB {
 	return DB.Select(selection).Find(&books)
 }
 
-func (book *Book) GetUserBookWithAuthor(ID uint, userID uint) (err error) {
+func (book *Book) GetUserBookWithAuthors(ID uint, userID uint) (err error) {
 	return DB.Preload("Authors").Where("id = ? AND user_id = ?", ID, userID).First(&book).Error
 }
 
-func (book *Book) GetBookWithAuthor(ID uint) (err error) {
+func (book *Book) GetBookWithAuthors(ID uint) (err error) {
 	return DB.Preload("Authors").Where("id = ?", ID).First(&book).Error
 }
 
-func (book *Book) CreateBookWithAuthor(authors []Author) (err error) {
+func (book *Book) CreateBookWithAuthors(authors []Author) (err error) {
 	return DB.Create(&book).Association("Authors").Append(authors)
 }
 

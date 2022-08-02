@@ -16,6 +16,10 @@ func (author *Author) GetAuthorByID(ID uint) (err error) {
 	return DB.Where("id = ?", ID).First(&author).Error
 }
 
+func (author *Author) GetAuthorWithBooks(ID uint) (err error) {
+	return DB.Preload("Books").Where("id = ?", ID).First(&author).Error
+}
+
 func (author *Author) CreateBook() (err error) {
 	return DB.Create(&author).Error
 }

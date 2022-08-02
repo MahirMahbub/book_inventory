@@ -41,7 +41,7 @@ const docTemplate = `{
                 "tags": [
                     "admin/authors"
                 ],
-                "summary": "Add an author",
+                "summary": "Add an Author by Admin",
                 "parameters": [
                     {
                         "description": "Add authors",
@@ -58,6 +58,74 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/structs.AuthorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/structs.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/authors/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get author",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "authors"
+                ],
+                "summary": "Show Author Details to Admin",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Author ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.AuthorAPIResponse"
                         }
                     },
                     "400": {
@@ -381,7 +449,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "admin/book"
+                    "admin/books"
                 ],
                 "summary": "Update a Book by Admin",
                 "parameters": [
@@ -874,7 +942,7 @@ const docTemplate = `{
                 "tags": [
                     "elastic"
                 ],
-                "summary": "Show Authors by Searching",
+                "summary": "Show Authors by Searching for User",
                 "parameters": [
                     {
                         "type": "integer",
@@ -955,7 +1023,7 @@ const docTemplate = `{
                 "tags": [
                     "elastic"
                 ],
-                "summary": "Show Books by Searching",
+                "summary": "Show Books by Searching for User",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1101,23 +1169,6 @@ const docTemplate = `{
                 }
             }
         },
-        "structs.AuthorBasicResponse": {
-            "type": "object",
-            "properties": {
-                "firstName": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "structs.AuthorElasticPaginatedResponse": {
             "type": "object",
             "properties": {
@@ -1172,7 +1223,7 @@ const docTemplate = `{
                         "authors": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/structs.AuthorBasicResponse"
+                                "$ref": "#/definitions/structs.HyperAuthorResponse"
                             }
                         },
                         "description": {

@@ -42,7 +42,7 @@ func (c *Controller) GetElasticInfo(context *gin.Context) {
 }
 
 //SearchBooks godoc
-//@Summary      Show Books by Searching
+//@Summary      Show Books by Searching for User
 //@Description  get paginated list of books by search term
 //@Tags         elastic
 //@Accept       json
@@ -97,7 +97,7 @@ func (c *Controller) SearchBooks(context *gin.Context) {
 }
 
 //SearchAuthors godoc
-//@Summary      Show Authors by Searching
+//@Summary      Show Authors by Searching for User
 //@Description  get paginated list of authors by search term
 //@Tags         elastic
 //@Accept       json
