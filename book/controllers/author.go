@@ -55,7 +55,7 @@ func (c *Controller) CreateAuthor(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"data": authorResponse})
 }
 
-//FindAuthors godoc
+//SearchAuthors godoc
 //@Summary      Show Authors by Searching
 //@Description  get paginated list of authors by search term
 //@Tags         elastic
@@ -72,7 +72,7 @@ func (c *Controller) CreateAuthor(context *gin.Context) {
 //@Failure      500  {object}  structs.ErrorResponse
 //@Router       /elastic/authors [get]
 //@Security BearerAuth
-func (c *Controller) FindAuthors(context *gin.Context) {
+func (c *Controller) SearchAuthors(context *gin.Context) {
 
 	var err error
 	var page, limit int

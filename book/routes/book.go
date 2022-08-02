@@ -15,4 +15,12 @@ func BookRoute(v1 *gin.RouterGroup, c *controllers.Controller) {
 		bookGroup.DELETE(":id", c.DeleteBook)
 		bookGroup.PATCH(":id", c.UpdateBook)
 	}
+	bookAdminGroup := v1.Group("/admin").Use(middlewares.AdminAuth())
+	{
+		bookAdminGroup.GET(":id", c.FindBook)
+		bookGroup.GET("", c.FindUserBooks)
+		bookGroup.POST("", c.CreateBook)
+		bookGroup.DELETE(":id", c.DeleteBook)
+		bookGroup.PATCH(":id", c.UpdateBook)
+	}
 }
