@@ -104,7 +104,7 @@ func (c *Controller) FindBook(context *gin.Context) {
 		return
 	}
 
-	if err := book.GetUserBookWithAuthor(uint(id), claim.UserId); err != nil {
+	if err := book.GetUserBookWithAuthors(uint(id), claim.UserId); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.BaseErrorResponse(context, http.StatusNotFound, err, logger.INFO)
 			return
@@ -113,7 +113,7 @@ func (c *Controller) FindBook(context *gin.Context) {
 		return
 	}
 
-	bookResponse := utils.CreateBookResponse(book)
+	bookResponse := utils.CreateBookResponse(context, book, claim.IsAdmin)
 	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
@@ -161,12 +161,12 @@ func (c *Controller) CreateBook(context *gin.Context) {
 
 	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
 
-	if err := book.CreateBookWithAuthor(authors); err != nil {
+	if err := book.CreateBookWithAuthors(authors); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not created", err, logger.ERROR)
 		return
 	}
 
-	bookResponse := utils.CreateBookResponse(book)
+	bookResponse := utils.CreateBookResponse(context, book, claim.IsAdmin)
 	context.JSON(http.StatusCreated, gin.H{"data": bookResponse})
 }
 

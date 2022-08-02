@@ -62,7 +62,7 @@ type BookBaseResponse struct {
 
 type BookResponse struct {
 	BookBaseResponse
-	Authors []AuthorBasicResponse `json:"authors"`
+	Authors []HyperAuthorResponse `json:"authors"`
 }
 
 type BookAPIResponse struct {

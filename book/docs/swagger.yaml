@@ -14,17 +14,6 @@ definitions:
             type: string
         type: object
     type: object
-  structs.AuthorBasicResponse:
-    properties:
-      firstName:
-        type: string
-      id:
-        type: integer
-      lastName:
-        type: string
-      name:
-        type: string
-    type: object
   structs.AuthorElasticPaginatedResponse:
     properties:
       data:
@@ -60,7 +49,7 @@ definitions:
         properties:
           authors:
             items:
-              $ref: '#/definitions/structs.AuthorBasicResponse'
+              $ref: '#/definitions/structs.HyperAuthorResponse'
             type: array
           description:
             type: string
@@ -241,9 +230,53 @@ paths:
             $ref: '#/definitions/structs.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Add an author
+      summary: Add an Author by Admin
       tags:
       - admin/authors
+  /admin/authors/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get author
+      parameters:
+      - description: Author ID
+        format: int
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.AuthorAPIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Show Author Details to Admin
+      tags:
+      - authors
   /admin/books:
     get:
       consumes:
