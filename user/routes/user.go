@@ -63,6 +63,11 @@ func SetupRouter() *gin.Engine {
 			userGroup.POST("/resend-verify-token", c.ResendUserVerifyEmail)
 			userGroup.POST("/send-password-change-token", c.SendPasswordChangeEmail)
 			userGroup.PUT("/change-password", c.ChangePassword)
+
+		}
+		adminGroup := v1.Group("/admin").Use(middlewares.AdminAuth())
+		{
+			adminGroup.POST("/create-admin", c.CreateAdmin)
 		}
 	}
 	return r
