@@ -8,13 +8,20 @@
 - Added bearer jwt auth
 ## Services
 - book service
-  - Get Book
-  - Post Book
-  - Get Paginated Books
-  - Update Book
-  - Delete Book
-  - Post Author by admin
-  - Get Author
+  - user
+    - Get Book
+    - Post Book
+    - Get Paginated Books
+    - Update Book
+    - Delete Book
+    - Get Author
+  - admin
+    - Get Book
+    - Post Book
+    - Get Paginated Books
+    - Update Book
+    - Delete Book
+    - Post Author by admin
 - user service
   - JWT Authentication
     - Register
