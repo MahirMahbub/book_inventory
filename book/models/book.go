@@ -19,6 +19,10 @@ func (book *Book) GetUserBookByID(ID uint, userID uint) (err error) {
 	return DB.Where("id = ? AND user_id = ?", ID, userID).First(&book).Error
 }
 
+func (book *Book) GetBookByID(ID uint) (err error) {
+	return DB.Where("id = ?", ID).First(&book).Error
+}
+
 func (books *Books) GetUserBooksBySelection(userID uint, selection []string) *gorm.DB {
 	return DB.Where("user_id = ?", userID).Select(selection).Find(&books)
 }

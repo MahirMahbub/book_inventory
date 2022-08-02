@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go_practice/book/auth"
 	"go_practice/book/elasticsearch"
@@ -160,8 +159,11 @@ func (c *Controller) CreateBook(context *gin.Context) {
 		}
 		authors = append(authors, author)
 	}
-
-	book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
+	if !claim.IsAdmin {
+		book = models.Book{Title: input.Title, Description: input.Description}
+	} else {
+		book = models.Book{Title: input.Title, UserID: claim.UserId, Description: input.Description}
+	}
 
 	if err := book.CreateUserBookWithAuthor(authors); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not created", err, logger.ERROR)
@@ -201,13 +203,25 @@ func (c *Controller) UpdateBook(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusBadRequest, "book can not be updated, invalid id", err, logger.INFO)
 		return
 	}
-	if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+	if claim.IsAdmin {
+		if err := book.GetBookByID(uint(id_)); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+				return
+			}
+			utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 			return
 		}
-		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
-		return
+	} else {
+		if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+				return
+			}
+			utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+			return
+		}
+
 	}
 
 	if err := context.ShouldBindJSON(&input); err != nil {
@@ -251,13 +265,25 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusBadRequest, "book can not be updated, invalid id", err, logger.INFO)
 		return
 	}
-	if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+	if claim.IsAdmin {
+		if err := book.GetBookByID(uint(id_)); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+				return
+			}
+			utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 			return
 		}
-		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
-		return
+	} else {
+		if err := book.GetUserBookByID(uint(id_), claim.UserId); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+				return
+			}
+			utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+			return
+		}
+
 	}
 
 	if err := book.DeleteBook(); err != nil {
@@ -267,7 +293,7 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 	context.JSON(http.StatusNoContent, gin.H{"data": true})
 }
 
-//FindBooks godoc
+//SearchBooks godoc
 //@Summary      Show Books by Searching
 //@Description  get paginated list of books by search term
 //@Tags         elastic
@@ -284,7 +310,7 @@ func (c *Controller) DeleteBook(context *gin.Context) {
 //@Failure      500  {object}  structs.ErrorResponse
 //@Router       /elastic/books [get]
 //@Security BearerAuth
-func (c *Controller) FindBooks(context *gin.Context) {
+func (c *Controller) SearchBooks(context *gin.Context) {
 
 	var err error
 	var page, limit int
@@ -310,12 +336,10 @@ func (c *Controller) FindBooks(context *gin.Context) {
 	search = context.DefaultQuery("search", "")
 
 	from := (page - 1) * limit
-	fmt.Println(search, from, limit)
 	r, err := elasticsearch.GetPaginatedBookSearch(context, from, limit, search, buf, err)
 
 	authorsData := utils.CreateBookListSearchResponse(r)
 	authorStructData := utils.CreateHyperBookElasticResponses(context, authorsData)
-	//
 	paginatedResponse := utils.CreateHyperPaginatedBookResponses(page, limit, authorStructData)
 
 	context.JSON(
