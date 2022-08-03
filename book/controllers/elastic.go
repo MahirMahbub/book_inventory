@@ -119,7 +119,7 @@ func (c *Controller) SearchAuthors(context *gin.Context) {
 	var page, limit int
 	var search string
 	tokenString := context.GetHeader("Authorization")
-	err, _ = auth.ValidateToken(tokenString)
+	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -143,7 +143,7 @@ func (c *Controller) SearchAuthors(context *gin.Context) {
 	r, err := elasticsearch2.GetPaginatedAuthorSearch(context, from, limit, search, buf, err)
 
 	authorsData := utils.CreateAuthorListSearchResponse(r)
-	authorStructData := utils.CreateHyperAuthorResponses(context, authorsData)
+	authorStructData := utils.CreateHyperAuthorResponses(context, authorsData, claim.IsAdmin)
 
 	paginatedResponse := utils.CreateHyperPaginatedAuthorResponses(page, limit, authorStructData)
 

@@ -51,6 +51,39 @@ definitions:
       lastName:
         type: string
     type: object
+  structs.AuthorsPaginatedResponse:
+    properties:
+      data:
+        properties:
+          limit:
+            type: integer
+          nextPage:
+            type: integer
+          offset:
+            type: integer
+          page:
+            type: integer
+          prevPage:
+            type: integer
+          records:
+            items:
+              properties:
+                firstName:
+                  type: string
+                id:
+                  type: integer
+                lastName:
+                  type: string
+                url:
+                  type: string
+              type: object
+            type: array
+          totalPage:
+            type: integer
+          totalRecord:
+            type: integer
+        type: object
+    type: object
   structs.BookAPIResponse:
     properties:
       data:
@@ -198,6 +231,53 @@ info:
   version: "1.0"
 paths:
   /admin/authors:
+    get:
+      consumes:
+      - application/json
+      description: gets all authors
+      parameters:
+      - description: paginate
+        format: int
+        in: query
+        name: page
+        type: integer
+      - description: paginate
+        format: int
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.AuthorsPaginatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Show Authors to Admin
+      tags:
+      - admin/authors
     post:
       consumes:
       - application/json

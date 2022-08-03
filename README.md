@@ -26,8 +26,8 @@
     - Delete Book
     - Post Author
     - Get Author
+    - Get Paginated Authors
     - Create Admin
-    
 - user service
   - JWT Authentication
     - Register

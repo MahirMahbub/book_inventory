@@ -11,6 +11,7 @@ func AuthorRoute(v1 *gin.RouterGroup, c *controllers.Controller) {
 	{
 		authorAdminGroup.POST("", c.CreateAdminAuthor)
 		authorAdminGroup.GET(":id", c.FindAdminAuthor)
+		authorAdminGroup.GET("", c.FindAdminAuthors)
 	}
 	authorGroup := v1.Group("/authors").Use(middlewares.Auth())
 	{
