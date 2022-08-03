@@ -6,6 +6,10 @@ type CreateAuthorInput struct {
 	Description string `json:"description"`
 }
 
+type UpdateAuthorInput struct {
+	CreateAuthorInput
+}
+
 type AuthorBase struct {
 	ID        uint   `json:"id"`
 	FirstName string `json:"firstName"`
@@ -68,4 +72,8 @@ type AuthorsPaginatedResponse struct {
 		PrevPage int `json:"prevPage"`
 		NextPage int `json:"nextPage"`
 	} `json:"data"`
+}
+
+type AuthorDeleteResponse struct {
+	Data bool `json:"data"`
 }

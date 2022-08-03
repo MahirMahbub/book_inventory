@@ -176,7 +176,7 @@ func (c *Controller) CreateBook(context *gin.Context) {
 // @Tags         books
 // @Accept       json
 // @Produce      json
-// @Param        id  path  int  true  "Account ID"
+// @Param        id  path  int  true  "Book ID"
 // @Param        input  body  structs.UpdateBookInput  false  "Update books"
 // @Success      200      {object}  structs.BookAPIResponse
 // @Failure      400      {object}  structs.ErrorResponse

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go_practice/book/auth"
 	"go_practice/book/logger"
@@ -45,7 +46,7 @@ func (c *Controller) CreateAdminAuthor(context *gin.Context) {
 	var author models.Author
 	author = models.Author{FirstName: input.FirstName, LastName: input.LastName, Description: input.Description}
 
-	if err := author.CreateBook(); err != nil {
+	if err := author.CreateAuthor(); err != nil {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "author is not created", err, logger.ERROR)
 		return
 	}
@@ -164,4 +165,101 @@ func (c *Controller) FindAdminAuthors(context *gin.Context) {
 
 	paginator.Records = authorResponses
 	context.JSON(http.StatusOK, gin.H{"data": paginator})
+}
+
+// UpdateAdminAuthor godoc
+// @Summary      Update an Author by Admin
+// @Description  patch author
+// @Tags         admin/authors
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "Author ID" Format(int)
+// @Param        input  body  structs.UpdateAuthorInput  false  "Update authors"
+// @Success      200      {object}  structs.AuthorAPIResponse
+// @Failure      400      {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
+// @Failure      404      {object}  structs.ErrorResponse
+// @Failure      500      {object}  structs.ErrorResponse
+// @Router       /admin/authors/{id} [patch]
+// @Security BearerAuth
+func (c *Controller) UpdateAdminAuthor(context *gin.Context) {
+	var id_ int
+	var author models.Author
+	var input structs.UpdateAuthorInput
+	tokenString := context.GetHeader("Authorization")
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+	if id_, err = strconv.Atoi(context.Param("id")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "author can not be updated, invalid id", err, logger.INFO)
+		return
+	}
+	if err := author.GetAuthorWithBooks(uint(id_)); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		return
+	}
+	fmt.Println(author)
+	if err := context.ShouldBindJSON(&input); err != nil {
+		utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+		return
+	}
+
+	if err := author.UpdateAuthor(input); err != nil {
+		utils.CustomErrorResponse(context, http.StatusForbidden, "author is not updated", err, logger.ERROR)
+		return
+	}
+	bookResponse := utils.CreateAuthorObjectResponse(context, author, claim.IsAdmin)
+	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
+}
+
+// DeleteAdminAuthor godoc
+// @Summary      Delete an Author by Admin
+// @Description  delete author
+// @Tags         admin/authors
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "Book ID"  Format(int)
+// @Success      204  {object}  structs.AuthorDeleteResponse
+// @Failure      400  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
+// @Failure      404  {object}  structs.ErrorResponse
+// @Failure      500  {object}  structs.ErrorResponse
+// @Router       /admin/authors/{id} [delete]
+// @Security BearerAuth
+func (c *Controller) DeleteAdminAuthor(context *gin.Context) {
+	var author models.Author
+	var id_ int
+	tokenString := context.GetHeader("Authorization")
+	err, _ := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+	if id_, err = strconv.Atoi(context.Param("id")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "author can not be updated, invalid id", err, logger.INFO)
+		return
+	}
+
+	if err := author.GetAuthorByID(uint(id_)); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		return
+	}
+
+	if err := author.DeleteAuthor(); err != nil {
+		utils.CustomErrorResponse(context, http.StatusForbidden, "author is not deleted", err, logger.ERROR)
+		return
+	}
+	context.JSON(http.StatusNoContent, gin.H{"data": true})
 }
