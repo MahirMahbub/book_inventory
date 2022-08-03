@@ -74,6 +74,25 @@ func CreateHyperBookResponses(ctx *gin.Context, books []models.Book) []structs.H
 	return bookResponses
 }
 
+func CreateHyperBookResponsesForAuthor(ctx *gin.Context, books []*models.Book, isAdmin bool) []structs.HyperBookResponse {
+	scheme := "http"
+	if ctx.Request.TLS != nil {
+		scheme = "https"
+	}
+	apiPath := "api/v1/books/"
+	if isAdmin {
+		apiPath = "api/v1/admin/books/"
+	}
+
+	url := scheme + "://" + ctx.Request.Host + "/" + apiPath
+	var bookResponses []structs.HyperBookResponse
+	for _, book := range books {
+		bookResponse := CreateHyperBookResponse(*book, url)
+		bookResponses = append(bookResponses, bookResponse)
+	}
+	return bookResponses
+}
+
 func CreateHyperBookElasticResponses(ctx *gin.Context, books []structs.BookBase) []structs.HyperBookResponse {
 
 	scheme := "http"

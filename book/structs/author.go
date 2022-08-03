@@ -19,7 +19,8 @@ type HyperAuthorResponse struct {
 
 type AuthorResponse struct {
 	AuthorBase
-	Description string `json:"description"`
+	Description string              `json:"description"`
+	Books       []HyperBookResponse `json:"books"`
 }
 
 type AuthorAPIResponse struct {

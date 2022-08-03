@@ -37,7 +37,7 @@ func (c *Controller) CreateAdminAuthor(context *gin.Context) {
 	}
 
 	tokenString := context.GetHeader("Authorization")
-	err, _ := auth.ValidateToken(tokenString)
+	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -49,7 +49,7 @@ func (c *Controller) CreateAdminAuthor(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "author is not created", err, logger.ERROR)
 		return
 	}
-	authorResponse := utils.CreateAuthorObjectResponse(author)
+	authorResponse := utils.CreateAuthorObjectResponse(context, author, claim.IsAdmin)
 	context.JSON(http.StatusCreated, gin.H{"data": authorResponse})
 }
 
@@ -73,7 +73,7 @@ func (c *Controller) FindAdminAuthor(context *gin.Context) {
 	var id uint64
 	var err error
 	tokenString := context.GetHeader("Authorization")
-	err, _ = auth.ValidateToken(tokenString)
+	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -92,6 +92,6 @@ func (c *Controller) FindAdminAuthor(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
 		return
 	}
-	authorResponse := utils.CreateAuthorObjectResponse(author)
+	authorResponse := utils.CreateAuthorObjectResponse(context, author, claim.IsAdmin)
 	context.JSON(http.StatusOK, gin.H{"data": authorResponse})
 }

@@ -4,6 +4,10 @@ definitions:
     properties:
       data:
         properties:
+          books:
+            items:
+              $ref: '#/definitions/structs.HyperBookResponse'
+            type: array
           description:
             type: string
           firstName:
@@ -34,6 +38,10 @@ definitions:
     type: object
   structs.AuthorResponse:
     properties:
+      books:
+        items:
+          $ref: '#/definitions/structs.HyperBookResponse'
+        type: array
       description:
         type: string
       firstName:

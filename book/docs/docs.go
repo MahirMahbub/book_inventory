@@ -1153,6 +1153,12 @@ const docTemplate = `{
                 "data": {
                     "type": "object",
                     "properties": {
+                        "books": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.HyperBookResponse"
+                            }
+                        },
                         "description": {
                             "type": "string"
                         },
@@ -1200,6 +1206,12 @@ const docTemplate = `{
         "structs.AuthorResponse": {
             "type": "object",
             "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.HyperBookResponse"
+                    }
+                },
                 "description": {
                     "type": "string"
                 },
