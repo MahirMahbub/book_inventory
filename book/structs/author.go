@@ -51,3 +51,21 @@ type AuthorPaginated struct {
 	PrevPage int                   `json:"prev_page"`
 	NextPage int                   `json:"next_page"`
 }
+
+type AuthorsPaginatedResponse struct {
+	Data struct {
+		TotalRecord int `json:"totalRecord"`
+		TotalPage   int `json:"totalPage"`
+		Records     []struct {
+			ID        uint   `json:"id"`
+			FirstName string `json:"firstName"`
+			LastName  string `json:"lastName"`
+			Url       string `json:"url"`
+		} `json:"records"`
+		Offset   int `json:"offset"`
+		Limit    int `json:"limit"`
+		Page     int `json:"page"`
+		PrevPage int `json:"prevPage"`
+		NextPage int `json:"nextPage"`
+	} `json:"data"`
+}

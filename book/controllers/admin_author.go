@@ -95,3 +95,73 @@ func (c *Controller) FindAdminAuthor(context *gin.Context) {
 	authorResponse := utils.CreateAuthorObjectResponse(context, author, claim.IsAdmin)
 	context.JSON(http.StatusOK, gin.H{"data": authorResponse})
 }
+
+// FindAdminAuthors godoc
+// @Summary      Show Authors to Admin
+// @Description  gets all authors
+// @Tags         admin/authors
+// @Accept       json
+// @Produce      json
+// @Param        page   query  int  false "paginate" Format(int)
+// @Param        limit   query  int  false "paginate" Format(int)
+// @Success      200  {object}  structs.AuthorsPaginatedResponse
+// @Failure      400  {object}  structs.ErrorResponse
+// @Failure      401  {object}  structs.ErrorResponse
+// @Failure      403  {object}  structs.ErrorResponse
+// @Failure      404  {object}  structs.ErrorResponse
+// @Failure      500  {object}  structs.ErrorResponse
+// @Router       /admin/authors [get]
+// @Security BearerAuth
+func (c *Controller) FindAdminAuthors(context *gin.Context) {
+
+	var authors models.Authors
+	var err error
+	var page, limit int
+	var db *gorm.DB
+	tokenString := context.GetHeader("Authorization")
+	err, claim := auth.ValidateToken(tokenString)
+	if err != nil {
+		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
+		return
+	}
+
+	if page, err = strconv.Atoi(context.DefaultQuery("page", "1")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'page' param value type, Integer expected", err, logger.INFO)
+		return
+	}
+
+	if limit, err = strconv.Atoi(context.DefaultQuery("limit", "10")); err != nil {
+		utils.CustomErrorResponse(context, http.StatusBadRequest, "invalid 'limit' param value type, Integer expected", err, logger.INFO)
+		return
+	}
+
+	if db = authors.GetAuthorsBySelection([]string{"id", "first_name", "last_name"}); db.Error != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.BaseErrorResponse(context, http.StatusBadRequest, err, logger.INFO)
+			return
+		}
+		utils.CustomErrorResponse(context, http.StatusForbidden, "operation is not allowed", err, logger.ERROR)
+		return
+	}
+	paginator := utils.Paging(&utils.Param{
+		DB:      db,
+		Page:    page,
+		Limit:   limit,
+		OrderBy: []string{"id desc"},
+		ShowSQL: true,
+	}, &authors)
+
+	var authorsList []structs.AuthorBase
+	for i := 0; i < len(authors); i++ {
+		tempAuthor := structs.AuthorBase{
+			ID:        authors[i].ID,
+			FirstName: authors[i].FirstName,
+			LastName:  authors[i].LastName,
+		}
+		authorsList = append(authorsList, tempAuthor)
+	}
+	authorResponses := utils.CreateHyperAuthorResponses(context, authorsList, claim.IsAdmin)
+
+	paginator.Records = authorResponses
+	context.JSON(http.StatusOK, gin.H{"data": paginator})
+}
