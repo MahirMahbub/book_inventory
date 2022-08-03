@@ -1146,6 +1146,12 @@
                 "data": {
                     "type": "object",
                     "properties": {
+                        "books": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.HyperBookResponse"
+                            }
+                        },
                         "description": {
                             "type": "string"
                         },
@@ -1193,6 +1199,12 @@
         "structs.AuthorResponse": {
             "type": "object",
             "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.HyperBookResponse"
+                    }
+                },
                 "description": {
                     "type": "string"
                 },
