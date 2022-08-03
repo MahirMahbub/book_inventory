@@ -44,7 +44,16 @@ func (book *Book) CreateBookWithAuthors(authors []Author) (err error) {
 }
 
 func (book *Book) UpdateBook(input structs.UpdateBookInput) (err error) {
-	return DB.Model(&book).Updates(input).Error
+	if input.Title != "" {
+		book.Title = input.Title
+	}
+	if input.Description != "" {
+		book.Description = input.Description
+	}
+	if err := DB.Save(&book).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (book *Book) DeleteBook() (err error) {

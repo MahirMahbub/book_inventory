@@ -173,7 +173,7 @@ func (c *Controller) CreateAdminBook(context *gin.Context) {
 // @Tags         admin/books
 // @Accept       json
 // @Produce      json
-// @Param        id  path  int  true  "Account ID"
+// @Param        id  path  int  true  "Book ID" Format(int)
 // @Param        input  body  structs.UpdateBookInput  false  "Update books"
 // @Success      200      {object}  structs.BookAPIResponse
 // @Failure      400      {object}  structs.ErrorResponse
@@ -188,7 +188,7 @@ func (c *Controller) UpdateAdminBook(context *gin.Context) {
 	var book models.Book
 	var input structs.UpdateBookInput
 	tokenString := context.GetHeader("Authorization")
-	err, _ := auth.ValidateToken(tokenString)
+	err, claim := auth.ValidateToken(tokenString)
 	if err != nil {
 		utils.BaseErrorResponse(context, http.StatusUnauthorized, err, logger.INFO)
 		return
@@ -215,7 +215,7 @@ func (c *Controller) UpdateAdminBook(context *gin.Context) {
 		utils.CustomErrorResponse(context, http.StatusForbidden, "book is not updated", err, logger.ERROR)
 		return
 	}
-	bookResponse := utils.CreateBookObjectResponse(book)
+	bookResponse := utils.CreateBookResponse(context, book, claim.IsAdmin)
 	context.JSON(http.StatusOK, gin.H{"data": bookResponse})
 }
 
