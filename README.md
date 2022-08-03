@@ -27,6 +27,8 @@
     - Post Author
     - Get Author
     - Get Paginated Authors
+    - Update Author
+    - Delete Author
     - Create Admin
 - user service
   - JWT Authentication
