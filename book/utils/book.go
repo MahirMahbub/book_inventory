@@ -7,15 +7,28 @@ import (
 	"strconv"
 )
 
-func CreateBookResponse(book models.Book) structs.BookResponse {
+func CreateBookResponse(ctx *gin.Context, book models.Book, isAdmin bool) structs.BookResponse {
 	var bookResponse structs.BookResponse
 	bookResponse.ID = book.ID
 	bookResponse.Title = book.Title
 	bookResponse.UserID = book.UserID
 	bookResponse.Description = book.Description
-	var authors []structs.AuthorBasicResponse
+	scheme := "http"
+	if ctx.Request.TLS != nil {
+		scheme = "https"
+	}
+	apiPath := "api/v1/authors/"
+	if isAdmin {
+		apiPath = "api/v1/admin/authors/"
+	}
+
+	url := scheme + "://" + ctx.Request.Host + "/" + apiPath
+	var authors []structs.HyperAuthorResponse
 	for _, author := range book.Authors {
-		customAuthor := CreateBasicAuthorResponse(author)
+		tempAuthor := structs.AuthorBase{ID: author.ID,
+			FirstName: author.FirstName, LastName: author.LastName}
+		customAuthor := CreateHyperAuthorResponse(tempAuthor, url)
+
 		authors = append(authors, customAuthor)
 	}
 	bookResponse.Authors = authors
@@ -61,6 +74,25 @@ func CreateHyperBookResponses(ctx *gin.Context, books []models.Book) []structs.H
 	return bookResponses
 }
 
+func CreateHyperBookResponsesForAuthor(ctx *gin.Context, books []*models.Book, isAdmin bool) []structs.HyperBookResponse {
+	scheme := "http"
+	if ctx.Request.TLS != nil {
+		scheme = "https"
+	}
+	apiPath := "api/v1/books/"
+	if isAdmin {
+		apiPath = "api/v1/admin/books/"
+	}
+
+	url := scheme + "://" + ctx.Request.Host + "/" + apiPath
+	var bookResponses []structs.HyperBookResponse
+	for _, book := range books {
+		bookResponse := CreateHyperBookResponse(*book, url)
+		bookResponses = append(bookResponses, bookResponse)
+	}
+	return bookResponses
+}
+
 func CreateHyperBookElasticResponses(ctx *gin.Context, books []structs.BookBase) []structs.HyperBookResponse {
 
 	scheme := "http"
@@ -79,7 +111,7 @@ func CreateHyperBookElasticResponses(ctx *gin.Context, books []structs.BookBase)
 
 }
 
-func CreateBookListSearchResponse(input map[string]interface{}) []structs.BookBase {
+func CreateBookListSearchResponse(input map[string]interface{}, userId uint) []structs.BookBase {
 	var booksData []structs.BookBase
 	booksData = []structs.BookBase{}
 	if len(input) > 0 {
@@ -88,9 +120,11 @@ func CreateBookListSearchResponse(input map[string]interface{}) []structs.BookBa
 		for i := 0; i < len(dataList); i++ {
 			var bookDetails structs.BookBase
 			sources := dataList[i].(map[string]interface{})["_source"].(map[string]interface{})
-			bookDetails.ID = uint(sources["book_id"].(float64))
-			bookDetails.Title = sources["title"].(string)
-			booksData = append(booksData, bookDetails)
+			if sources["user_id"] == nil || sources["user_id"] == userId {
+				bookDetails.ID = uint(sources["book_id"].(float64))
+				bookDetails.Title = sources["title"].(string)
+				booksData = append(booksData, bookDetails)
+			}
 		}
 	}
 	return booksData

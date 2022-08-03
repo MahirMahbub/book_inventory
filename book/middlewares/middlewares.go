@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go_practice/book/auth"
 	"go_practice/book/logger"
@@ -39,8 +38,15 @@ func Auth() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
-		err, _ := auth.ValidateToken(tokenString)
+		err, claims := auth.ValidateToken(tokenString)
 		if err != nil {
+			context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			context.Abort()
+			return
+		}
+		if claims.IsAdmin {
+			err = errors.New("user is admin, can not call user api")
+			logger.Info.Println(err.Error())
 			context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			context.Abort()
 			return
@@ -68,7 +74,6 @@ func AdminAuth() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
-		fmt.Println(claims)
 		if claims.IsAdmin == false {
 			err = errors.New("user is not admin")
 			logger.Info.Println(err.Error())

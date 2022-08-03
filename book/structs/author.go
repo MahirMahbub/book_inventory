@@ -6,6 +6,10 @@ type CreateAuthorInput struct {
 	Description string `json:"description"`
 }
 
+type UpdateAuthorInput struct {
+	CreateAuthorInput
+}
+
 type AuthorBase struct {
 	ID        uint   `json:"id"`
 	FirstName string `json:"firstName"`
@@ -19,7 +23,8 @@ type HyperAuthorResponse struct {
 
 type AuthorResponse struct {
 	AuthorBase
-	Description string `json:"description"`
+	Description string              `json:"description"`
+	Books       []HyperBookResponse `json:"books"`
 }
 
 type AuthorAPIResponse struct {
@@ -49,4 +54,26 @@ type AuthorPaginated struct {
 	Page     int                   `json:"page"`
 	PrevPage int                   `json:"prev_page"`
 	NextPage int                   `json:"next_page"`
+}
+
+type AuthorsPaginatedResponse struct {
+	Data struct {
+		TotalRecord int `json:"totalRecord"`
+		TotalPage   int `json:"totalPage"`
+		Records     []struct {
+			ID        uint   `json:"id"`
+			FirstName string `json:"firstName"`
+			LastName  string `json:"lastName"`
+			Url       string `json:"url"`
+		} `json:"records"`
+		Offset   int `json:"offset"`
+		Limit    int `json:"limit"`
+		Page     int `json:"page"`
+		PrevPage int `json:"prevPage"`
+		NextPage int `json:"nextPage"`
+	} `json:"data"`
+}
+
+type AuthorDeleteResponse struct {
+	Data bool `json:"data"`
 }

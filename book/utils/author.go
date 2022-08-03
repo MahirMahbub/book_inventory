@@ -7,28 +7,25 @@ import (
 	"strconv"
 )
 
-func CreateBasicAuthorResponse(author *models.Author) structs.AuthorBasicResponse {
-	var customAuthor structs.AuthorBasicResponse
-	customAuthor.ID = author.ID
-	customAuthor.Name = author.FirstName + " " + author.LastName
-	return customAuthor
-}
-
-func CreateAuthorObjectResponse(author models.Author) structs.AuthorResponse {
+func CreateAuthorObjectResponse(ctx *gin.Context, author models.Author, isAdmin bool) structs.AuthorResponse {
 	var authorResponse structs.AuthorResponse
 	authorResponse.ID = author.ID
 	authorResponse.FirstName = author.FirstName
 	authorResponse.LastName = author.LastName
 	authorResponse.Description = author.Description
+	authorResponse.Books = CreateHyperBookResponsesForAuthor(ctx, author.Books, isAdmin)
 	return authorResponse
 }
 
-func CreateHyperAuthorResponses(ctx *gin.Context, authors []structs.AuthorBase) []structs.HyperAuthorResponse {
+func CreateHyperAuthorResponses(ctx *gin.Context, authors []structs.AuthorBase, isAdmin bool) []structs.HyperAuthorResponse {
 	scheme := "http"
 	if ctx.Request.TLS != nil {
 		scheme = "https"
 	}
-	apiPath := "api/v1/books/"
+	apiPath := "api/v1/authors/"
+	if isAdmin {
+		apiPath = "api/v1/admin/authors/"
+	}
 	url := scheme + "://" + ctx.Request.Host + apiPath
 	var bookResponses []structs.HyperAuthorResponse
 	bookResponses = []structs.HyperAuthorResponse{}
