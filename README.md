@@ -42,4 +42,38 @@
    - Get paginated Authors by name search(fuzzy search in first_name, last_name) (only for user)
    - Get paginated Books by name search(fuzzy search in title, author's first_name, author's last_name) (only for user)
 
+- Postgres to ELK Sync
+
+
+                                  +---------------v------------------+
+                                  |                                  |
+                                  |              data                |
+                                  |                                  |
+                                  +---------------+------------------+
+                                                  |
+                                                  |
+                                                  |
+                                                  |
+                                           +------v------+
+                                           |             |
+                                           |  PostgreSQL |
+                                           |             |
+                                           +------^------+
+                                                  |
+                                                  |
+                                                  |
+                                  +---------------v------------------+
+                                  |                                  |
+                                  |            Logstash              |
+                                  |                                  |
+                                  +---------------+------------------+
+                                                  |
+                                                  |
+                                                  |
+                                                  |
+                                          +-------v--------+
+                                          |                |
+                                          | Elasticsearch  |
+                                          |                |
+                                          +----------------+
     
